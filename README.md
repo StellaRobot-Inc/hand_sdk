@@ -41,7 +41,7 @@ Feedback: [https://gitee.com/stellarrobot/handsdk/issues](https://gitee.com/stel
 
 Email: [zhiqiangtan89@gmail.com](zhiqiangtan89@gmail.com)
 
-Documentation: [https://hand-control.readthedocs.io/](https://hand-control.readthedocs.io/)
+Documentation: [https://qcnqdkti44v2.feishu.cn/wiki](https://qcnqdkti44v2.feishu.cn/wiki/FoLuwaO3ziOTSZkzplHcStIxnm7)
 
 # License
 This project is licensed under the MIT License , see [LICENSE](LICENSE) for details.
