@@ -29,21 +29,21 @@ A unified control module for Stellarobot dexterous hands, supporting multiple ha
 ```
 hand/
 ├── hand/
-│   ├── __init__.py          # 模块入口
-│   ├── core.py              # 核心抽象类和适配器
-│   ├── gaiahand/            # Gaia手部实现
-│   │   ├── gaia_hand.py     # Gaia手部适配器
-│   │   ├── motor.py         # 电机控制
-│   │   └── hand_mappings.py # 映射关系
-│   ├── pantheonhand/        # Pantheon手部实现
-│   │   ├── pantheon_hand.py # Pantheon手部适配器
-│   │   └── can_utils/       # CAN通信工具
-│   └── utils/               # 工具函数
-│       └── serial_utils.py  # 串口工具
-├── example/                 # 示例代码
-├── docs/                    # 文档
-├── tests/                   # 测试代码
-└── setup.py                 # 安装配置
+│   ├── __init__.py          # Module Entry
+│   ├── core.py              # Core Abstract Classes and Adapters
+│   ├── gaiahand/            # GaiaHand Implementation
+│   │   ├── gaia_hand.py     # GaiaHand Adapter
+│   │   ├── motor.py         # Motor Control
+│   │   └── hand_mappings.py # Mapping
+│   ├── pantheonhand/        # PantheonHand Implementation
+│   │   ├── pantheon_hand.py # PantheonHand Adapter
+│   │   └── can_utils/       # CAN Communication Utilities
+│   └── utils/               # Utility Functions
+│       └── serial_utils.py  # Serial Port Utilities
+├── example/                 # Examples
+├── docs/                    # Documentation
+├── tests/                   # Tests
+└── setup.py                 # Installation
 ```
 
 # Documentation
