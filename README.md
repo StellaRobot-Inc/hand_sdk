@@ -34,7 +34,7 @@ hand/
 ```
 
 # Documentation
-For more detailed documentation,  see [hand_SDK Development Guidelines](https://qcnqdkti44v2.feishu.cn/wiki/FoLuwaO3ziOTSZkzplHcStIxnm7)
+For more detailed documentation,  see [HandSDK Development Guidelines](https://qcnqdkti44v2.feishu.cn/wiki/FoLuwaO3ziOTSZkzplHcStIxnm7)
 
 # Contact
 Homepage: [StellaRobot](https://www.stella-robot.com/)
