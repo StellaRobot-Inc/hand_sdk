@@ -1,4 +1,4 @@
-# hand_SDK
+# hand_sdk
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Python](https://img.shields.io/badge/Python-3.7%2B-blue.svg)
 
@@ -35,13 +35,9 @@ hand/
 For more detailed documentation,  see [hand_SDK Development Guidelines](https://qcnqdkti44v2.feishu.cn/wiki/FoLuwaO3ziOTSZkzplHcStIxnm7)
 
 # Contact
-Project Homepage: [https://gitee.com/stellarrobot/handsdk](https://gitee.com/stellarrobot/handsdk)
+Homepage: [StellaRobot]((https://www.stella-robot.com/))
 
-Feedback: [https://gitee.com/stellarrobot/handsdk/issues](https://gitee.com/stellarrobot/handsdk/issues)
-
-Email: [zhiqiangtan89@gmail.com](zhiqiangtan89@gmail.com)
-
-Documentation: [https://qcnqdkti44v2.feishu.cn/wiki](https://qcnqdkti44v2.feishu.cn/wiki/FoLuwaO3ziOTSZkzplHcStIxnm7)
+Feedback: [support@stella-robot.com](support@stella-robot.com)
 
 # License
 This project is licensed under the MIT License , see [LICENSE](LICENSE) for details.
