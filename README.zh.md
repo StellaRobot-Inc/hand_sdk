@@ -8,7 +8,7 @@
 
 | 语言 | 安装方式 | 帮助文档 | 例程 |
 |----------|---------|------|---------|
-| Python | `pip install handsdk` | [HandSDK开发指南](https://qcnqdkti44v2.feishu.cn/wiki/FoLuwaO3ziOTSZkzplHcStIxnm7)) | [GaiaHand](./example/gaiahand_example.py) [PantheonHand](./example/pantheonhand_example.py) |
+| Python | `pip install handsdk` | [HandSDK开发指南](https://qcnqdkti44v2.feishu.cn/wiki/FoLuwaO3ziOTSZkzplHcStIxnm7) | [GaiaHand](./example/gaiahand_example.py) [PantheonHand](./example/pantheonhand_example.py) |
 
 # SDK 架构
 ```
