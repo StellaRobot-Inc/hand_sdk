@@ -1,30 +1,30 @@
 ﻿#!/usr/bin/env python3
 """
-GaiaHand 控制示例文件
+GaiaHand control example
 
-⭐ 推荐使用 Gaia20（16关节版本），当前主要维护版本
-⚠️ Gaia15（15关节版本）已暂停维护，示例代码仅用于兼容旧代码
+⭐ Recommended: GaiaHand20 (16-joint version), currently the main maintained release
+⚠️ GaiaHand15 (15-joint version) is no longer maintained; example code kept for backward compatibility only
 
-功能说明：
-- 测试不同手部类型的 move_joints_pos 方法，包括单手和双手模式
-- 串口自动检测功能
-- 电机平滑等级设置
-- 关节位置控制（列表格式和字典格式）
-- 手势执行和回零操作
-- 错误处理和资源清理
-- 日志管理功能（enable_all_logs、disable_all_logs、set_log_level、set_console_only、
-  set_file_only、set_both_output、show_log_status、log_controller，可通过 test_log_management() 测试）
+Features:
+- Test move_joints_pos for different hand types, including single-hand and dual-hand modes
+- Automatic serial port detection
+- Motor smoothing level configuration
+- Joint position control (list and dict formats)
+- Gesture execution and homing operations
+- Error handling and resource cleanup
+- Log management (enable_all_logs, disable_all_logs, set_log_level, set_console_only,
+  set_file_only, set_both_output, show_log_status, log_controller; exercise via test_log_management())
 
-波特率配置说明：
-- Gaia15: 230400（标准配置）
-  - 注意：示例文件中部分测试函数使用了921600，但标准配置应为230400
-- Gaia20不带主控板: 230400（默认配置）
-- Gaia20带主控板: 921600（高性能配置）
+Baud rate configuration:
+- GaiaHand15: 230400 (standard configuration)
+  - Note: some test functions in this file use 921600, but the standard setting is 230400
+- GaiaHand20 without main board: 230400 (default configuration)
+- GaiaHand20 with main board: 921600 (high-performance configuration)
 
-使用说明：
-1. 根据您的硬件配置选择合适的波特率
-2. 在main()函数中取消注释相应的测试函数来运行测试
-3. 默认优先运行Gaia20测试函数
+Usage:
+1. Choose an appropriate baud rate for your hardware
+2. Uncomment the desired test functions in main() to run tests
+3. GaiaHand20 tests are preferred by default
 """
 
 import time
@@ -32,14 +32,14 @@ import sys
 import os
 import math
 
-# 添加项目根目录到 Python 路径
+# Add project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from hand import create_hand, HandSide
 from hand.gaiahand.hand_mappings import FingerType, JointType
 from hand.utils.serial_utils import auto_detect_gaia_ports
 
-# 导入日志管理功能
+# Import log management utilities
 from hand.core import (
     enable_all_logs,
     disable_all_logs,
@@ -53,215 +53,215 @@ from hand.core import (
 
 def set_motor_smooth_level(hand, device_id: int = 255, level: int = 3, description: str = ""):
     """
-    设置电机平滑等级的辅助函数
+    Helper to set motor smoothing level
     
     Args:
-        hand: 手部控制实例
-        device_id: 设备ID，255表示广播所有电机，None表示使用默认值
-        level: 平滑等级 (0-5)，数值越大平滑效果越好
-        description: 可选的描述信息，用于打印日志
+        hand: Hand control instance
+        device_id: Device ID; 255 broadcasts to all motors, None uses the default
+        level: Smoothing level (0-5); higher values yield smoother motion
+        description: Optional description text for logging
     """
     desc_text = f" ({description})" if description else ""
-    print(f"设置电机平滑等级{desc_text}...")
-    print(f"  参数: device_id={device_id}, level={level}")
+    print(f"Setting motor smoothing level{desc_text}...")
+    print(f"  Parameters: device_id={device_id}, level={level}")
     try:
         hand.config_pos_lpf_lv(device_id=device_id, level=level)
-        print(f"电机平滑等级设置成功（device_id={device_id}, level={level}）")
+        print(f"Motor smoothing level set succeeded (device_id={device_id}, level={level})")
         return True
     except Exception as e:
-        print(f"电机平滑等级设置失败: {e}")
+        print(f"Failed to set motor smoothing level: {e}")
         import traceback
         traceback.print_exc()
         return False
 
 
 def test_log_management():
-    """测试日志管理功能"""
+    """Test log management features"""
     print("\n" + "=" * 60)
-    print("=== 测试日志管理功能 ===")
+    print("=== Test log management ===")
 
-    # 1. 测试启用所有日志
-    print("\n1. 启用所有日志...")
+    # 1. Test enabling all logs
+    print("\n1. Enable all logs...")
     enable_all_logs()
-    print("✅ 已启用所有日志")
+    print("All logs enabled")
 
-    # 2. 测试设置日志级别
-    print("\n2. 设置日志级别为 DEBUG...")
+    # 2. Test setting log level
+    print("\n2. Set log level to DEBUG...")
     set_log_level('DEBUG')
-    print("✅ 已设置日志级别为 DEBUG")
+    print("Log level set to DEBUG")
 
-    # 3. 测试不同输出方式
-    print("\n3. 测试不同输出方式...")
+    # 3. Test different output modes
+    print("\n3. Test different output modes...")
 
-    print("   - 设置为控制台输出...")
+    print("   - Set to console output...")
     set_console_only()
-    print("   ✅ 已设置为仅控制台输出")
+    print("   Console-only output enabled")
 
-    print("   - 设置为文件输出...")
+    print("   - Set to file output...")
     set_file_only()
-    print("   ✅ 已设置为仅文件输出")
+    print("   File-only output enabled")
 
-    print("   - 设置为控制台+文件输出...")
+    print("   - Set to console + file output...")
     set_both_output()
-    print("   ✅ 已设置为控制台+文件输出")
+    print("   Console + file output enabled")
 
-    # 4. 测试禁用所有日志
-    print("\n4. 测试禁用所有日志...")
+    # 4. Test disabling all logs
+    print("\n4. Test disabling all logs...")
     disable_all_logs()
-    print("❌ 已禁用所有日志")
+    print("All logs disabled")
 
-    # 测试禁用日志后的效果 - 这些日志应该不会显示
-    print("\n   测试禁用日志后的效果（以下日志应该不会显示）:")
+    # Verify effect after disabling logs — messages below should not appear
+    print("\n   Test effect after disabling logs (messages below should not appear):")
     from hand.core import get_logger
     test_logger = get_logger('test.disable_logs')
-    test_logger.info("这条 INFO 日志应该不会显示")
-    test_logger.warning("这条 WARNING 日志应该不会显示")
-    test_logger.error("这条 ERROR 日志应该不会显示")
-    print("   ✅ 禁用日志测试完成")
+    test_logger.info("This INFO log should not appear")
+    test_logger.warning("This WARNING log should not appear")
+    test_logger.error("This ERROR log should not appear")
+    print("   Disable-log test complete")
 
-    # 5. 测试特定脚本的日志控制
-    print("\n5. 测试特定脚本的日志控制...")
+    # 5. Test per-script log control
+    print("\n5. Test per-script log control...")
     log_controller.set_script_logging('gaiahand.motor', enabled=True, level='WARNING')
-    print("✅ 已设置 gaiahand.motor 为 WARNING 级别")
+    print("Set gaiahand.motor to WARNING level")
 
-    # 6. 显示当前日志状态
-    print("\n6. 当前日志状态:")
+    # 6. Show current log status
+    print("\n6. Current log status:")
     show_log_status()
 
-    # 7. 重新启用日志以便后续测试
-    print("\n7. 重新启用日志以便后续测试...")
+    # 7. Re-enable logs for subsequent tests
+    print("\n7. Re-enable logs for subsequent tests...")
     enable_all_logs()
     set_log_level('INFO')
     set_both_output()
-    print("✅ 已重新启用日志")
+    print("Logs re-enabled")
 
 
 def detect_serial_ports():
     """
-    检测可用的串口
+    Detect available serial ports
     
     Returns:
-        dict: 串口配置信息
+        dict: Serial port configuration dict
     """
     try:
-        print("正在检测可用串口...")
+        print("Detecting available serial ports...")
         ports_config = auto_detect_gaia_ports()
         
         if not ports_config or not ports_config['available']:
-            print("未检测到可用串口，请检查硬件连接")
+            print("No serial ports detected; check hardware connection")
             return None
         
         return ports_config
         
     except Exception as e:
-        print(f"串口检测失败: {e}")
+        print(f"Serial port detection failed: {e}")
         return None
 
 
-def test_gaia20_hand_create_hand(ports_config):
+def test_gaiahand20_create_hand(ports_config):
     """
-    测试 GaiaHand20 的创建方式
+    Test GaiaHand20 instance creation
     
-    列举具体的创建手的方式（单手/双手、串口/SLCAN、带/不带主控板等）。
+    Lists concrete ways to create a hand (single/dual, serial/SLCAN, with/without main board, etc.).
     """
     print("\n" + "=" * 60)
-    print("=== GaiaHand20 创建方式与状态获取示例 ===")
+    print("=== GaiaHand20 creation and status query examples ===")
     print("=" * 60)
     
-    # ==================== 一、创建手的方式 ====================
-    print("\n【一、创建 GaiaHand20 的多种方式】\n")
-    print("串口说明: Windows 为 COM4/COM5 等，Linux 为 /dev/ttyUSB0、/dev/ttyACM0 等")
-    print("推荐: 使用 ports_config = auto_detect_gaia_ports() 自动检测，port=ports_config['right']\n")
+    # ==================== 1. Ways to create a hand ====================
+    print("\n[1. Ways to create GaiaHand20]\n")
+    print("Serial ports: Windows uses COM4/COM5 etc.; Linux uses /dev/ttyUSB0, /dev/ttyACM0, etc.")
+    print("Recommended: use ports_config = auto_detect_gaia_ports() for auto-detection, port=ports_config['right']\n")
     
-    print("1. 右手单手 - 串口直连（不带主控板，波特率 230400）")
-    print("   # 使用 ports_config（推荐）:")
-    print("   hand = create_hand('gaia20', 'right', port=ports_config['right'], baudrate=230400)")
-    print("   # 或指定串口: Windows port='COM4'，Linux port='/dev/ttyUSB0'")
+    print("1. Right hand only - serial direct (no main board, baudrate 230400)")
+    print("   # Use ports_config (recommended):")
+    print("   hand = create_hand('gaiahand20', 'right', port=ports_config['right'], baudrate=230400)")
+    print("   # Or specify port: Windows port='COM4', Linux port='/dev/ttyUSB0'")
     print()
     
-    print("2. 右手单手 - 串口直连（带主控板，波特率 921600）")
-    print("   hand = create_hand('gaia20', 'right', port=ports_config['right'], baudrate=921600, has_main_board=True)")
-    print("   # 或指定: port='COM4' (Win) / port='/dev/ttyUSB0' (Linux)")
+    print("2. Right hand only - serial direct (with main board, baudrate 921600)")
+    print("   hand = create_hand('gaiahand20', 'right', port=ports_config['right'], baudrate=921600, has_main_board=True)")
+    print("   # Or specify: port='COM4' (Win) / port='/dev/ttyUSB0' (Linux)")
     print()
     
-    print("3. 右手单手 - SLCAN/CAN 模式（默认带主控板）")
-    print("   hand = create_hand('gaia20', 'right', port=ports_config['right'], use_slcan=True)")
-    print("   # 或指定: port='COM6' (Win) / port='/dev/ttyUSB0' (Linux)")
-    print("   # 可选: slcan_tty_baudrate=115200, slcan_arbitration_bitrate=1000000, slcan_data_bitrate=2000000")
+    print("3. Right hand only - SLCAN/CAN mode (main board by default)")
+    print("   hand = create_hand('gaiahand20', 'right', port=ports_config['right'], use_slcan=True)")
+    print("   # Or specify: port='COM6' (Win) / port='/dev/ttyUSB0' (Linux)")
+    print("   # Optional: slcan_tty_baudrate=115200, slcan_arbitration_bitrate=1000000, slcan_data_bitrate=2000000")
     print()
     
-    print("4. 左手单手 - 串口直连")
-    print("   hand = create_hand('gaia20', 'left', port=ports_config['left'], baudrate=230400)")
-    print("   # 或指定: port='COM5' (Win) / port='/dev/ttyUSB1' (Linux)")
+    print("4. Left hand only - serial direct")
+    print("   hand = create_hand('gaiahand20', 'left', port=ports_config['left'], baudrate=230400)")
+    print("   # Or specify: port='COM5' (Win) / port='/dev/ttyUSB1' (Linux)")
     print()
     
-    print("5. 双手模式 - 串口直连")
-    print("   hand = create_hand('gaia20', 'double', left_port=ports_config['left'], right_port=ports_config['right'], baudrate=230400)")
-    print("   # 或指定: left_port='COM5', right_port='COM4' (Win) / left_port='/dev/ttyUSB1', right_port='/dev/ttyUSB0' (Linux)")
-    print("   # 带主控板: baudrate=921600")
+    print("5. Dual-hand mode - serial direct")
+    print("   hand = create_hand('gaiahand20', 'double', left_port=ports_config['left'], right_port=ports_config['right'], baudrate=230400)")
+    print("   # Or specify: left_port='COM5', right_port='COM4' (Win) / left_port='/dev/ttyUSB1', right_port='/dev/ttyUSB0' (Linux)")
+    print("   # With main board: baudrate=921600")
     print()
     
-    print("6. 双手模式 - SLCAN/CAN（默认带主控板）")
-    print("   hand = create_hand('gaia20', 'double', left_port=ports_config['left'], right_port=ports_config['right'], use_slcan=True)")
-    print("   # 或指定: left_port='COM5', right_port='COM4' (Win) / left_port='/dev/ttyUSB1', right_port='/dev/ttyUSB0' (Linux)")
+    print("6. Dual-hand mode - SLCAN/CAN (main board by default)")
+    print("   hand = create_hand('gaiahand20', 'double', left_port=ports_config['left'], right_port=ports_config['right'], use_slcan=True)")
+    print("   # Or specify: left_port='COM5', right_port='COM4' (Win) / left_port='/dev/ttyUSB1', right_port='/dev/ttyUSB0' (Linux)")
     print()
 
 
-def test_gaia20_hand_get_status(ports_config):
+def test_gaiahand20_get_status(ports_config):
     """
-    测试 GaiaHand20 的状态获取
+    Test GaiaHand20 status queries
     
-    演示：连接状态、关节位置、单个电机状态、所有电机状态。
+    Demonstrates connection state, joint positions, single-motor status, and all-motor status.
     """
     print("\n" + "=" * 60)
-    print("=== GaiaHand20 状态获取测试 ===")
+    print("=== GaiaHand20 status query test ===")
     print("=" * 60)
     
     if not ports_config or not ports_config.get('right'):
-        print("未检测到右手串口，跳过状态获取测试")
+        print("Right-hand serial port not detected; skipping status test")
         return
     
     hand = None
     try:
-        hand = create_hand("gaia20", "right", port=ports_config['right'], baudrate=230400)
+        hand = create_hand("gaiahand20", "right", port=ports_config['right'], baudrate=230400)
         
-        print(f"已创建实例: hand_type={hand.hand_type.value}, hand_side={hand.hand_side_name}")
-        print(f"连接前 is_connected(): {hand.is_connected()}")
+        print(f"Instance created: hand_type={hand.hand_type.value}, hand_side={hand.hand_side_name}")
+        print(f"Before connect is_connected(): {hand.is_connected()}")
         
         if not hand.connect():
-            print("连接失败，请检查串口与硬件")
+            print("Connection failed; check serial port and hardware")
             return
         
-        print(f"连接成功 (串口: {ports_config['right']})")
-        print(f"连接后 is_connected(): {hand.is_connected()}")
+        print(f"Connected (serial port: {ports_config['right']})")
+        print(f"After connect is_connected(): {hand.is_connected()}")
         
-        # 上使能
+        # Enable motors
         hand.enable_all_motors_broadcast(True)
         time.sleep(0.3)
         
-        # 1. 获取关节位置（异步）
-        print("\n--- 1. 关节位置（异步） ---")
+        # 1. Get joint positions (async)
+        print("\n--- 1. Joint positions (async) ---")
         positions = hand.get_joint_positions(sync=False)
         if positions:
-            print(f"共 {len(positions)} 个关节")
-            print(f"  前5个(弧度): {[f'{p:.3f}' if p is not None else 'None' for p in positions[:5]]}")
-            print(f"  前5个(度):   {[f'{math.degrees(p):.1f}°' if p is not None else 'None' for p in positions[:5]]}")
+            print(f"{len(positions)} joints total")
+            print(f"  First 5 (rad): {[f'{p:.3f}' if p is not None else 'None' for p in positions[:5]]}")
+            print(f"  First 5 (deg):   {[f'{math.degrees(p):.1f}°' if p is not None else 'None' for p in positions[:5]]}")
         
-        # 2. 获取关节位置（同步）
-        print("\n--- 2. 关节位置（同步） ---")
+        # 2. Get joint positions (sync)
+        print("\n--- 2. Joint positions (sync) ---")
         positions_sync = hand.get_joint_positions(sync=True, timeout=0.1)
         if positions_sync:
-            print(f"共 {len(positions_sync)} 个关节")
-            print(f"  前5个(度): {[f'{math.degrees(p):.1f}°' if p is not None else 'None' for p in positions_sync[:5]]}")
+            print(f"{len(positions_sync)} joints total")
+            print(f"  First 5 (deg): {[f'{math.degrees(p):.1f}°' if p is not None else 'None' for p in positions_sync[:5]]}")
         
-        # 3. 获取单个电机状态
-        print("\n--- 3. 单个电机状态（电机1） ---")
+        # 3. Get single motor status
+        print("\n--- 3. Single motor status (motor 1) ---")
         status_1 = hand.get_motor_status(motor_id=1, sync=True, timeout=0.5)
         print(f"online={status_1.get('online')}, angle={status_1.get('angle')}°, fsm_state={status_1.get('fsm_state')}, "
               f"temp={status_1.get('temp')}°C, bus_voltage={status_1.get('bus_voltage')}V")
         
-        # 4. 获取所有电机状态（在线/离线）
-        print("\n--- 4. 所有电机状态（在线/离线） ---")
+        # 4. Get all motor status (online/offline)
+        print("\n--- 4. All motor status (online/offline) ---")
         all_status = hand.get_motor_status(motor_id=None, sync=True, timeout=2.0)
         if isinstance(all_status, dict) and 1 in all_status:
             v = all_status[1]
@@ -269,14 +269,14 @@ def test_gaia20_hand_get_status(ports_config):
                 online_count = sum(1 for s in all_status.values() if isinstance(s, dict) and s.get('online'))
             else:
                 online_count = sum(1 for s in all_status.values() if s)
-            print(f"共 {len(all_status)} 个电机, 在线 {online_count} 个")
+            print(f"{len(all_status)} motors total, {online_count} online")
         
         hand.enable_all_motors_broadcast(False)
         hand.close()
-        print("\n状态获取测试完成")
+        print("\nStatus query test complete")
             
     except Exception as e:
-        print(f"状态获取出错: {e}")
+        print(f"Status query error: {e}")
         import traceback
         traceback.print_exc()
     finally:
@@ -287,73 +287,73 @@ def test_gaia20_hand_get_status(ports_config):
                 pass
 
 
-def test_gaia20_hand_joint_limits(ports_config, connect_for_motion: bool = False):
+def test_gaiahand20_joint_limits(ports_config, connect_for_motion: bool = False):
     """
-    测试 GaiaHand20 关节限位相关接口。
+    Test GaiaHand20 joint limit APIs.
 
-    默认只演示限位表查询、开关状态、临时设置和恢复默认，不连接硬件、不发送运动指令。
-    如需验证超限夹紧后的真实下发效果，可显式传入 connect_for_motion=True。
+    By default only demonstrates limit table queries, enable/disable, temporary settings, and restore-default; no hardware connection or motion commands.
+    Pass connect_for_motion=True to verify real clamping behavior on out-of-limit commands.
 
-    关节限位单位均为弧度(rad)。
+    All joint limit values are in radians (rad).
     """
     print("\n" + "=" * 60)
-    print("=== GaiaHand20 关节限位接口示例 ===")
+    print("=== GaiaHand20 joint limit API example ===")
     print("=" * 60)
 
     if not ports_config or not ports_config.get('right'):
-        print("未检测到右手串口，仍可使用示例串口名创建对象并演示非连接接口")
+        print("Right-hand serial port not detected; can still create object with example port and demo offline APIs")
 
     port = ports_config.get('right') if ports_config else None
     port = port or "COM0"
     hand = None
 
     try:
-        # joint_limit_enabled 默认就是 True，这里显式写出方便查看用法。
+        # joint_limit_enabled defaults to True; shown explicitly here for clarity.
         hand = create_hand(
-            "gaia20",
+            "gaiahand20",
             "right",
             port=port,
             baudrate=230400,
             joint_limit_enabled=True,
         )
 
-        print(f"已创建实例: hand_type={hand.hand_type.value}, hand_side={hand.hand_side_name}")
-        print(f"HandSDK关节限位默认状态: {hand.is_joint_limit_enabled()}")
+        print(f"Instance created: hand_type={hand.hand_type.value}, hand_side={hand.hand_side_name}")
+        print(f"HandSDK joint limit default state: {hand.is_joint_limit_enabled()}")
 
-        # 1. 查询单个关节限位
-        print("\n--- 1. 查询单个关节限位 ---")
+        # 1. Query a single joint limit
+        print("\n--- 1. Query single joint limit ---")
         thumb_j1_limit = hand.get_joint_limit(FingerType.THUMB, JointType.JOINT_1)
-        print(f"右手拇指 JOINT1 限位(rad): {thumb_j1_limit}")
+        print(f"Right thumb JOINT1 limit (rad): {thumb_j1_limit}")
         if thumb_j1_limit:
             print(
-                "右手拇指 JOINT1 限位(deg): "
+                "Right thumb JOINT1 limit (deg): "
                 f"({math.degrees(thumb_j1_limit[0]):.1f}, {math.degrees(thumb_j1_limit[1]):.1f})"
             )
 
-        # 2. 查询整张生效限位表
-        print("\n--- 2. 查询当前生效限位表 ---")
+        # 2. Query the full active limit table
+        print("\n--- 2. Query active limit table ---")
         limits = hand.get_joint_limits()
-        print(f"手指列表: {list(limits.keys())}")
+        print(f"Finger list: {list(limits.keys())}")
         print(f"thumb: {limits.get('thumb')}")
 
-        # 3. 开启/关闭 HandSDK 关节限位
-        print("\n--- 3. 开启/关闭 HandSDK 关节限位 ---")
+        # 3. Enable/disable HandSDK joint limits
+        print("\n--- 3. Enable/disable HandSDK joint limits ---")
         hand.disable_joint_limit()
-        print(f"关闭后: {hand.is_joint_limit_enabled()}")
+        print(f"After disable: {hand.is_joint_limit_enabled()}")
         hand.enable_joint_limit()
-        print(f"重新开启后: {hand.is_joint_limit_enabled()}")
+        print(f"After re-enable: {hand.is_joint_limit_enabled()}")
 
-        # 4. 临时设置单个关节限位
-        print("\n--- 4. 临时设置单个关节限位 ---")
+        # 4. Temporarily set a single joint limit
+        print("\n--- 4. Temporarily set single joint limit ---")
         original_limit = hand.get_joint_limit(FingerType.THUMB, JointType.JOINT_1)
         hand.set_joint_limit(FingerType.THUMB, JointType.JOINT_1, -0.1, 0.1)
-        print(f"临时设置后 thumb JOINT1: {hand.get_joint_limit(FingerType.THUMB, JointType.JOINT_1)}")
+        print(f"After temp set thumb JOINT1: {hand.get_joint_limit(FingerType.THUMB, JointType.JOINT_1)}")
         hand.reset_joint_limits(FingerType.THUMB, JointType.JOINT_1)
-        print(f"恢复单关节默认后 thumb JOINT1: {hand.get_joint_limit(FingerType.THUMB, JointType.JOINT_1)}")
-        print(f"原始默认值: {original_limit}")
+        print(f"After restore single joint default thumb JOINT1: {hand.get_joint_limit(FingerType.THUMB, JointType.JOINT_1)}")
+        print(f"Original default: {original_limit}")
 
-        # 5. 临时批量设置限位，支持字符串 JOINT1 和枚举 JointType 两种写法
-        print("\n--- 5. 临时批量设置关节限位 ---")
+        # 5. Temporarily batch-set limits; supports both string JOINT1 and JointType enum keys
+        print("\n--- 5. Temporarily batch-set joint limits ---")
         hand.set_joint_limits({
             "thumb": {
                 "JOINT1": (-0.2, 0.2),
@@ -363,60 +363,60 @@ def test_gaia20_hand_joint_limits(ports_config, connect_for_motion: bool = False
                 "JOINT1": (-0.15, 0.15),
             },
         })
-        print(f"批量设置后 thumb: {hand.get_joint_limits().get('thumb')}")
-        print(f"批量设置后 index JOINT1: {hand.get_joint_limit(FingerType.INDEX, JointType.JOINT_1)}")
+        print(f"After batch set thumb: {hand.get_joint_limits().get('thumb')}")
+        print(f"After batch set index JOINT1: {hand.get_joint_limit(FingerType.INDEX, JointType.JOINT_1)}")
         hand.reset_joint_limits()
-        print(f"全部恢复默认后 thumb: {hand.get_joint_limits().get('thumb')}")
+        print(f"After restore all defaults thumb: {hand.get_joint_limits().get('thumb')}")
 
-        # 6. 一次性修改所有关节限位
-        print("\n--- 6. 一次性修改所有关节限位 ---")
+        # 6. Modify all joint limits at once
+        print("\n--- 6. Modify all joint limits at once ---")
         default_limits = hand.get_joint_limits()
         all_joint_limits = {}
         for finger, joints in default_limits.items():
             all_joint_limits[finger] = {}
             for joint, (lower, upper) in joints.items():
-                # 示例：把所有关节的临时限位收窄到默认范围和 [-0.25, 0.25] 的交集。
-                # 实际项目中可把这里替换成标定/配置文件生成的整表限位。
+                # Example: narrow each joint's temporary limit to the intersection of its default range and [-0.25, 0.25].
+                # In production, replace this with a full limit table from calibration or config files.
                 new_lower = max(lower, -0.25)
                 new_upper = min(upper, 0.25)
                 all_joint_limits[finger][joint] = (new_lower, new_upper)
 
         hand.set_joint_limits(all_joint_limits)
         total_joint_count = sum(len(joints) for joints in all_joint_limits.values())
-        print(f"已一次性临时修改 {total_joint_count} 个关节限位")
-        print(f"整表设置后 thumb: {hand.get_joint_limits().get('thumb')}")
-        print(f"整表设置后 little: {hand.get_joint_limits().get('little')}")
+        print(f"Temporarily modified {total_joint_count} joint limits at once")
+        print(f"After full-table set thumb: {hand.get_joint_limits().get('thumb')}")
+        print(f"After full-table set little: {hand.get_joint_limits().get('little')}")
         hand.reset_joint_limits()
-        print(f"整表恢复默认后 thumb: {hand.get_joint_limits().get('thumb')}")
+        print(f"After full-table restore thumb: {hand.get_joint_limits().get('thumb')}")
 
-        # 7. 创建时关闭限位
-        print("\n--- 7. 创建时关闭关节限位 ---")
+        # 7. Disable limits at creation time
+        print("\n--- 7. Disable joint limits at creation ---")
         hand_no_limit = create_hand(
-            "gaia20",
+            "gaiahand20",
             "right",
             port=port,
             baudrate=230400,
             joint_limit_enabled=False,
         )
-        print(f"joint_limit_enabled=False 创建后状态: {hand_no_limit.is_joint_limit_enabled()}")
+        print(f"State after create with joint_limit_enabled=False: {hand_no_limit.is_joint_limit_enabled()}")
         if hasattr(hand_no_limit, 'close'):
             hand_no_limit.close()
 
-        # 8. 可选：连接硬件后验证超限夹紧
-        print("\n--- 8. 可选：连接硬件验证超限夹紧 ---")
+        # 8. Optional: connect hardware to verify limit clamping
+        print("\n--- 8. Optional: connect hardware to verify limit clamping ---")
         if not connect_for_motion:
-            print("默认跳过真实运动示例。需要时调用 test_gaia20_hand_joint_limits(ports_config, connect_for_motion=True)")
+            print("Skipping real motion by default. Call test_gaiahand20_joint_limits(ports_config, connect_for_motion=True) when needed")
             return
 
-        print("准备连接硬件并执行一个超限指令示例...")
+        print("Preparing to connect hardware and run an out-of-limit command example...")
         if not hand.connect():
-            print("连接失败，跳过真实运动示例")
+            print("Connection failed; skipping real motion example")
             return
 
         hand.enable_all_motors_broadcast(True)
         time.sleep(0.5)
         hand.set_joint_limit(FingerType.THUMB, JointType.JOINT_1, -0.1, 0.1)
-        print("发送 thumb JOINT1 = 1.0 rad，实际会被 HandSDK 夹紧到 0.1 rad 并记录 warning")
+        print("Sending thumb JOINT1 = 1.0 rad; HandSDK will clamp to 0.1 rad and record a warning")
         hand.set_joint_angle(FingerType.THUMB, JointType.JOINT_1, 1.0, speed=0.3)
         time.sleep(1.0)
         hand.reset_joint_limits()
@@ -424,7 +424,7 @@ def test_gaia20_hand_joint_limits(ports_config, connect_for_motion: bool = False
         time.sleep(1.0)
 
     except Exception as e:
-        print(f"GaiaHand20 关节限位示例失败: {e}")
+        print(f"GaiaHand20 joint limit example failed: {e}")
         import traceback
         traceback.print_exc()
     finally:
@@ -436,243 +436,243 @@ def test_gaia20_hand_joint_limits(ports_config, connect_for_motion: bool = False
                 pass
 
 
-def test_gaia20_hand_get_joint_positions(ports_config, tests_to_run=None):
+def test_gaiahand20_get_joint_positions(ports_config, tests_to_run=None):
     """
-    测试 GaiaHand20 的 get_joint_positions 功能（16关节版本）
+    Test GaiaHand20 get_joint_positions (16-joint version)
     
-    ⭐ 推荐使用：Gaia20当前主要维护版本
+    ⭐ Recommended: GaiaHand20 is the currently maintained version
     
-    波特率配置：230400（不带主控板版本）
+    Baud rate: 230400 (without main board)
     
     Args:
-        ports_config: 串口配置字典
-        tests_to_run: 要运行的测试列表，例如 [1, 2, 3] 表示只运行测试1、2、3
-                     如果为 None 或空列表，则运行所有测试（默认行为）
-                     可用测试编号：1-7
-                     测试1：获取所有关节位置（异步模式）
-                     测试2：获取所有关节位置（同步模式）
-                     测试3：设置位置后获取位置验证
-                     测试4：多次获取位置（观察数据变化）
-                     测试5：获取指定关节位置
-                     测试6：回零后获取位置
-                     测试7：从0位置插补到目标位置，每步获取位置
+        ports_config: Serial port configuration dict
+        tests_to_run: List of sub-tests to run, e.g. [1, 2, 3] runs tests 1, 2, and 3 only
+                     If None or empty, run all tests (default behavior)
+                     Available test IDs: 1-7
+                     Test 1: get all joint positions (async)
+                     Test 2: get all joint positions (sync)
+                     Test 3: verify positions after setting
+                     Test 4: repeated position reads (observe changes)
+                     Test 5: get specific joint positions
+                     Test 6: get positions after homing
+                     Test 7: interpolate from zero to target, read position each step
     """
-    print("\n=== 测试 GaiaHand20 get_joint_positions 功能（16关节版本）===")
+    print("\n=== Test GaiaHand20 get_joint_positions (16-joint version) ===")
     
-    # 如果没有指定测试列表，则运行所有测试
+    # If no test list is given, run all tests
     if tests_to_run is None:
         tests_to_run = [7]
     elif not tests_to_run:
         tests_to_run = [1, 2, 3, 4, 5, 6, 7]
     
-    # 显示将要运行的测试
-    print(f"将要运行的测试: {tests_to_run}")
+    # Show which tests will run
+    print(f"Tests to run: {tests_to_run}")
     
     if not ports_config or not ports_config['right']:
-        print("未找到可用的右手串口，跳过获取位置测试")
+        print("No available right-hand serial port; skipping get-position test")
         return
     
     hand = None
     try:
-        # 创建右手 GaiaHand20 实例
-        # ⭐ 波特率配置说明：
-        # - 带主控板版本：baudrate=921600（高性能配置）
-        # - 不带主控板版本：baudrate=230400（默认配置）
-        # hand = create_hand("gaia20", "right", port=ports_config['right'], baudrate=921600, has_main_board=True)  # 带主控板版本，自动识别端口号
-        # hand = create_hand("gaia20", "right", port=ports_config['right'], baudrate=230400)  # 不带主控板版本，自动识别端口号
-        # hand = create_hand("gaia20", "right", port='COM12', baudrate=921600, has_main_board=True)  # 串口，自配端口号
-        # hand = create_hand("gaia20", "right", port='COM8', baudrate=921600, has_main_board=True)  # 串口，自配端口号，带主控板
+        # Create right-hand GaiaHand20 instance
+        # ⭐ Baud rate configuration:
+        # - With main board: baudrate=921600 (high-performance)
+        # - Without main board: baudrate=230400 (default)
+        # hand = create_hand("gaiahand20", "right", port=ports_config['right'], baudrate=921600, has_main_board=True)  # with main board, auto-detected port
+        # hand = create_hand("gaiahand20", "right", port=ports_config['right'], baudrate=230400)  # without main board, auto-detected port
+        # hand = create_hand("gaiahand20", "right", port='COM12', baudrate=921600, has_main_board=True)  # serial, user-specified port
+        # hand = create_hand("gaiahand20", "right", port='COM8', baudrate=921600, has_main_board=True)  # serial, user-specified port, with main board
 
-        # hand = create_hand("gaia20", "right", port=ports_config['right'], use_slcan=True)   # SLCAN模式，默认带主控板
-        hand = create_hand("gaia20", "right", port='COM6', use_slcan=True, has_main_board=True)   # SLCAN模式，带主控板
+        # hand = create_hand("gaiahand20", "right", port=ports_config['right'], use_slcan=True)   # SLCAN mode, main board by default
+        hand = create_hand("gaiahand20", "right", port='COM6', use_slcan=True, has_main_board=True)   # SLCAN mode, with main board
 
 
         if hand.connect():
-            print(f"GaiaHand20 连接成功 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 Connected (serial port: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=0）
-            # 平滑等级范围：0-5，level=0表示关闭平滑
-            set_motor_smooth_level(hand, device_id=255, level=3, description="测试关闭平滑")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=0)
+            # Smoothing range 0-5; level=0 disables smoothing
+            set_motor_smooth_level(hand, device_id=255, level=3, description="disable smoothing test")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             # time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(0.5)
             
-            # 测试1：获取所有关节位置（异步模式），建议使用异步模式
+            # Test 1: get all joint positions (async); async mode recommended
             if 1 in tests_to_run:
-                print("\n--- 测试1：获取所有关节位置（异步模式） ---")
+                print("\n--- Test 1: get all joint positions (async) ---")
                 all_positions = hand.get_joint_positions(sync=False)
-                print(f"所有关节位置（异步）: {all_positions}")
-                print(f"位置数据类型: {type(all_positions)}")
+                print(f"All joint positions (async): {all_positions}")
+                print(f"Position data type: {type(all_positions)}")
                 if isinstance(all_positions, (list, tuple)):
-                    print(f"位置数据长度: {len(all_positions)}")
+                    print(f"Position data length: {len(all_positions)}")
                     if len(all_positions) > 0:
-                        print(f"前5个关节位置: {all_positions[:5]}")
-                        print(f"后5个关节位置: {all_positions[-5:]}")
+                        print(f"First 5 joint positions: {all_positions[:5]}")
+                        print(f"Last 5 joint positions: {all_positions[-5:]}")
                 time.sleep(1)
             
-            # 测试2：获取所有关节位置（同步模式）
+            # Test 2: get all joint positions (sync)
             if 2 in tests_to_run:
-                print("\n--- 测试2：获取所有关节位置（同步模式） ---")
+                print("\n--- Test 2: get all joint positions (sync) ---")
                 all_positions_sync = hand.get_joint_positions(sync=True, timeout=0.1)
-                print(f"所有关节位置（同步）: {all_positions_sync}")
-                print(f"位置数据类型: {type(all_positions_sync)}")
+                print(f"All joint positions (sync): {all_positions_sync}")
+                print(f"Position data type: {type(all_positions_sync)}")
                 if isinstance(all_positions_sync, (list, tuple)):
-                    print(f"位置数据长度: {len(all_positions_sync)}")
+                    print(f"Position data length: {len(all_positions_sync)}")
                     if len(all_positions_sync) > 0:
-                        print(f"前5个关节位置: {all_positions_sync[:5]}")
-                        print(f"后5个关节位置: {all_positions_sync[-5:]}")
-                        # 转换为度数显示
-                        print("前5个关节位置（度）: ", [math.degrees(p) if p is not None else None for p in all_positions_sync[:5]])
+                        print(f"First 5 joint positions: {all_positions_sync[:5]}")
+                        print(f"Last 5 joint positions: {all_positions_sync[-5:]}")
+                        # Convert to degrees for display
+                        print("First 5 joint positions (deg): ", [math.degrees(p) if p is not None else None for p in all_positions_sync[:5]])
                 time.sleep(0.5)
             
-            # 测试3：设置位置后获取位置验证
+            # Test 3: verify positions after setting
             if 3 in tests_to_run:
-                print("\n--- 测试3：设置位置后获取位置验证 ---")
-                # 设置一个已知位置
+                print("\n--- Test 3: verify positions after set ---")
+                # Set a known target position
                 target_positions = [
-                    # 拇指的4个关节
+                    # Thumb 4 joints
                     0.0, math.radians(10.0), math.radians(20.0), math.radians(15.0),
-                    # 食指的3个关节
+                    # Index 3 joints
                     0.0, math.radians(45.0), math.radians(40.0),
-                    # 中指的3个关节
+                    # Middle 3 joints
                     0.0, math.radians(45.0), math.radians(45.0),
-                    # 无名指的3个关节
+                    # Ring 3 joints
                     0.0, math.radians(40.0), math.radians(40.0),
-                    # 小指的3个关节
+                    # Little 3 joints
                     0.0, math.radians(45.0), math.radians(45.0)
                 ]
                 
-                print(f"设置目标位置（弧度）: {target_positions[:5]}...")
+                print(f"Target positions (rad): {target_positions[:5]}...")
                 success = hand.move_joints_pos(target_positions, speed=0.8, use_broadcast=True)
-                print(f"设置位置结果: {'成功' if success else '失败'}")
+                print(f"Set position result: {'succeeded' if success else 'failed'}")
                 
-                # 等待运动完成
+                # Wait for motion to finish
                 time.sleep(2)
                 
-                # 获取当前位置
+                # Read current positions
                 current_positions = hand.get_joint_positions(sync=True, timeout=0.1)
-                print(f"当前位置（弧度）: {current_positions}")
+                print(f"Current positions (rad): {current_positions}")
                 if isinstance(current_positions, (list, tuple)) and len(current_positions) >= 16:
-                    print("位置对比（前5个关节）:")
+                    print("Position comparison (first 5 joints):")
                     for i in range(5):
                         target = target_positions[i] if i < len(target_positions) else None
                         current = current_positions[i] if i < len(current_positions) else None
                         if target is not None and current is not None:
                             diff = abs(target - current)
-                            print(f"  关节{i+1}: 目标={math.degrees(target):.2f}°, 当前={math.degrees(current):.2f}°, 误差={math.degrees(diff):.2f}°")
+                            print(f"  Joint {i+1}: target={math.degrees(target):.2f}°, current={math.degrees(current):.2f}°, error={math.degrees(diff):.2f}°")
                         else:
-                            print(f"  关节{i+1}: 目标={target}, 当前={current}")
+                            print(f"  Joint {i+1}: target={target}, current={current}")
                 time.sleep(1)
             
-            # 测试4：多次获取位置（观察数据变化）
+            # Test 4: repeated position reads (observe changes)
             if 4 in tests_to_run:
-                print("\n--- 测试4：多次获取位置（观察数据变化） ---")
+                print("\n--- Test 4: repeated position reads (observe changes) ---")
                 for i in range(3):
                     positions = hand.get_joint_positions(sync=True, timeout=0.1)
                     if isinstance(positions, (list, tuple)) and len(positions) >= 16:
-                        # 显示拇指的4个关节
+                        # Show thumb 4 joints
                         thumb_positions = positions[:4] if len(positions) >= 4 else []
                         thumb_degrees = [math.degrees(p) if p is not None else None for p in thumb_positions]
-                        print(f"第{i+1}次获取 - 拇指关节位置（度）: {thumb_degrees}")
+                        print(f"Read {i+1} - thumb joint positions (deg): {thumb_degrees}")
                     else:
-                        print(f"第{i+1}次获取: {positions}")
+                        print(f"Read {i+1}: {positions}")
                     time.sleep(0.5)
             
-            # 测试5：获取指定关节位置（如果支持）
+            # Test 5: get specific joint positions (if supported)
             if 5 in tests_to_run:
-                print("\n--- 测试5：获取指定关节位置 ---")
-                # 注意：joint_names 参数的使用方式可能需要根据实际实现调整
-                # 这里先测试获取所有位置，然后提取特定关节
+                print("\n--- Test 5: get specific joint positions ---")
+                # Note: joint_names usage may need adjustment per actual implementation
+                # First fetch all positions, then extract specific joints
                 all_positions = hand.get_joint_positions(sync=True, timeout=0.1)
                 if isinstance(all_positions, (list, tuple)) and len(all_positions) >= 16:
-                    # 提取拇指的4个关节（索引0-3）
+                    # Extract thumb 4 joints (indices 0-3)
                     thumb_joints = all_positions[:4]
                     thumb_degrees = [math.degrees(p) if p is not None else None for p in thumb_joints]
-                    print(f"拇指的4个关节位置（度）: {thumb_degrees}")
+                    print(f"Thumb 4 joint positions (deg): {thumb_degrees}")
                     
-                    # 提取食指的3个关节（索引4-6）
+                    # Extract index 3 joints (indices 4-6)
                     index_joints = all_positions[4:7] if len(all_positions) >= 7 else []
                     index_degrees = [math.degrees(p) if p is not None else None for p in index_joints]
-                    print(f"食指的3个关节位置（度）: {index_degrees}")
+                    print(f"Index 3 joint positions (deg): {index_degrees}")
                     
-                    # 提取中指的3个关节（索引7-9）
+                    # Extract middle 3 joints (indices 7-9)
                     middle_joints = all_positions[7:10] if len(all_positions) >= 10 else []
                     middle_degrees = [math.degrees(p) if p is not None else None for p in middle_joints]
-                    print(f"中指的3个关节位置（度）: {middle_degrees}")
+                    print(f"Middle 3 joint positions (deg): {middle_degrees}")
             
-            # 如果测试6需要运行，或者测试3运行了（测试3会改变位置），则执行回零
-            # 如果只运行测试6，也需要先回零
+            # Run homing if test 6 is scheduled, or if test 3 ran (test 3 changes positions)
+            # If only test 6 runs, homing is still required first
             if 6 in tests_to_run or (3 in tests_to_run):
-                print("\n执行回零操作...")
+                print("\nExecuting homing...")
                 success = hand.hand_zero()
-                print(f"回零结果: {'成功' if success else '失败'}")
+                print(f"Homing result: {'succeeded' if success else 'failed'}")
                 time.sleep(1)
             
-            # 测试6：回零后获取位置
+            # Test 6: get positions after homing
             if 6 in tests_to_run:
-                print("\n--- 测试6：回零后获取位置 ---")
+                print("\n--- Test 6: get positions after homing ---")
                 zero_positions = hand.get_joint_positions(sync=True, timeout=0.1)
-                print(f"回零后位置（弧度）: {zero_positions}")
+                print(f"Positions after homing (rad): {zero_positions}")
                 if isinstance(zero_positions, (list, tuple)) and len(zero_positions) >= 16:
                     zero_degrees = [math.degrees(p) if p is not None else None for p in zero_positions]
-                    print(f"回零后位置（度）: {zero_degrees}")
+                    print(f"Positions after homing (deg): {zero_degrees}")
             
-            # 测试7：从0位置插补到目标位置，每步获取位置
+            # Test 7: interpolate from zero to target, read position each step
             if 7 in tests_to_run:
-                print("\n--- 测试7：从0位置插补到目标位置，每步获取位置 ---")
-                # 目标位置（与测试3相同）
+                print("\n--- Test 7: interpolate from zero to target, read each step ---")
+                # Target positions (same as test 3)
                 target_positions = [
-                    # 拇指的4个关节
+                    # Thumb 4 joints
                     0.0, math.radians(10.0), math.radians(20.0), math.radians(15.0),
-                    # 食指的3个关节
+                    # Index 3 joints
                     0.0, math.radians(30.0), math.radians(40.0),
-                    # 中指的3个关节
+                    # Middle 3 joints
                     0.0, math.radians(25.0), math.radians(35.0),
-                    # 无名指的3个关节
+                    # Ring 3 joints
                     0.0, math.radians(20.0), math.radians(30.0),
-                    # 小指的3个关节
+                    # Little 3 joints
                     0.0, math.radians(15.0), math.radians(25.0)
                 ]
                 
-                # 先回零，确保从0位置开始
-                # print("先回零，确保从0位置开始...")
+                # Home first to start from zero
+                # print("Homing first to ensure start from zero...")
                 # hand.hand_zero()
                 # time.sleep(1)
                 
-                # 获取初始位置（应该是0或接近0）- 使用异步方式
-                print("使用异步方式获取初始位置...")
+                # Read initial positions (should be 0 or near 0) — async
+                print("Getting initial positions asynchronously...")
                 initial_positions = hand.get_joint_positions(sync=False)
-                print(f"初始位置（弧度）: {initial_positions[:5]}...")
+                print(f"Initial positions (rad): {initial_positions[:5]}...")
                 if isinstance(initial_positions, (list, tuple)) and len(initial_positions) >= 16:
                     initial_degrees = [math.degrees(p) if p is not None else None for p in initial_positions[:5]]
-                    print(f"初始位置（度，前5个关节）: {initial_degrees}")
+                    print(f"Initial positions (deg, first 5 joints): {initial_degrees}")
                 
-                # 插补参数
-                interpolation_steps = 100  # 插补步数
-                step_delay = 0.0  # 每步延迟时间（秒）
+                # Interpolation parameters
+                interpolation_steps = 100  # interpolation steps
+                step_delay = 0.0  # delay per step (seconds)
                 
-                print(f"\n开始插补：从0位置到目标位置，共{interpolation_steps}步，每步延迟{step_delay}秒")
-                print(f"目标位置（度，前5个关节）: {[math.degrees(p) if p is not None else None for p in target_positions[:5]]}")
+                print(f"\nStarting interpolation: zero to target, {interpolation_steps} steps, {step_delay}s delay per step")
+                print(f"Target positions (deg, first 5 joints): {[math.degrees(p) if p is not None else None for p in target_positions[:5]]}")
                 
-                # 执行插补
+                # Run interpolation
                 for step in range(interpolation_steps + 1):
-                    # 计算插补系数 t ∈ [0, 1]
+                    # Compute interpolation factor t ∈ [0, 1]
                     t = step / interpolation_steps
                     
-                    # 计算当前步的插补位置
+                    # Compute interpolated position for this step
                     interpolated_positions = []
                     for i in range(len(target_positions)):
                         if i < len(initial_positions) and initial_positions[i] is not None:
@@ -683,23 +683,23 @@ def test_gaia20_hand_get_joint_positions(ports_config, tests_to_run=None):
                         else:
                             interpolated_positions.append(target_positions[i] * t)
                     
-                    # 设置插补位置
+                    # Send interpolated position
                     success = hand.move_joints_pos(interpolated_positions, speed=0.8, use_broadcast=True)
                     if not success:
-                        print(f"警告：第{step}步设置位置失败")
+                        print(f"Warning: failed to set position at step {step}")
                     
-                    # 获取实际位置（使用异步方式）
+                    # Read actual positions (async)
                     actual_positions = hand.get_joint_positions(sync=False)
                     
-                    # # 显示进度和位置信息
+                    # # Show progress and position info
                     # if isinstance(actual_positions, (list, tuple)) and len(actual_positions) >= 16:
-                    #     # 显示前5个关节的位置对比
-                    #     print(f"\n步骤 {step}/{interpolation_steps} (进度: {t*100:.1f}%):")
-                    #     print(f"  目标位置（度，前5个关节）: {[math.degrees(p) if p is not None else None for p in interpolated_positions[:5]]}")
+                    #     # Show first 5 joints target vs actual
+                    #     print(f"\nStep {step}/{interpolation_steps} (progress: {t*100:.1f}%):")
+                    #     print(f"  Target positions (deg, first 5 joints): {[math.degrees(p) if p is not None else None for p in interpolated_positions[:5]]}")
                     #     actual_degrees = [math.degrees(p) if p is not None else None for p in actual_positions[:5]]
-                    #     print(f"  实际位置（度，前5个关节）: {actual_degrees}")
+                    #     print(f"  Actual positions (deg, first 5 joints): {actual_degrees}")
                         
-                    #     # 计算误差
+                    #     # Compute error
                     #     errors = []
                     #     for i in range(min(5, len(interpolated_positions), len(actual_positions))):
                     #         if interpolated_positions[i] is not None and actual_positions[i] is not None:
@@ -707,26 +707,26 @@ def test_gaia20_hand_get_joint_positions(ports_config, tests_to_run=None):
                     #             errors.append(math.degrees(error))
                     #         else:
                     #             errors.append(None)
-                    #     print(f"  位置误差（度，前5个关节）: {errors}")
+                    #     print(f"  Position errors (deg, first 5 joints): {errors}")
                     # else:
-                    #     print(f"步骤 {step}/{interpolation_steps}: 获取位置失败或数据格式错误")
+                    #     print(f"Step {step}/{interpolation_steps}: failed to get positions or invalid data format")
                     
-                    # 等待一段时间，让电机运动
-                    # if step < interpolation_steps:  # 最后一步不需要延迟
+                    # Wait for motors to move
+                    # if step < interpolation_steps:  # no delay on final step
                     #     time.sleep(step_delay)
                 
-                print("\n插补完成！")
+                print("\nInterpolation complete!")
                 
-                # 最后再次获取位置，确认是否到达目标（使用异步方式）
-                print("使用异步方式获取最终位置...")
+                # Final position read to confirm target reached (async)
+                print("Getting final positions asynchronously...")
                 final_positions = hand.get_joint_positions(sync=False)
                 if isinstance(final_positions, (list, tuple)) and len(final_positions) >= 16:
                     final_degrees = [math.degrees(p) if p is not None else None for p in final_positions[:5]]
                     target_degrees = [math.degrees(p) if p is not None else None for p in target_positions[:5]]
-                    print(f"\n最终位置（度，前5个关节）: {final_degrees}")
-                    print(f"目标位置（度，前5个关节）: {target_degrees}")
+                    print(f"\nFinal positions (deg, first 5 joints): {final_degrees}")
+                    print(f"Target positions (deg, first 5 joints): {target_degrees}")
                     
-                    # 计算最终误差
+                    # Compute final error
                     final_errors = []
                     for i in range(min(5, len(target_positions), len(final_positions))):
                         if target_positions[i] is not None and final_positions[i] is not None:
@@ -734,7 +734,7 @@ def test_gaia20_hand_get_joint_positions(ports_config, tests_to_run=None):
                             final_errors.append(math.degrees(error))
                         else:
                             final_errors.append(None)
-                    print(f"最终误差（度，前5个关节）: {final_errors}")
+                    print(f"Final errors (deg, first 5 joints): {final_errors}")
                 
                 time.sleep(1)
                 
@@ -742,107 +742,107 @@ def test_gaia20_hand_get_joint_positions(ports_config, tests_to_run=None):
                 # time.sleep(1)
             
         else:
-            print(f"GaiaHand20 连接失败 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 connection failed (serial port: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand20 get_joint_positions 测试失败: {e}")
+        print(f"GaiaHand20 get_joint_positions test failed: {e}")
         import traceback
         traceback.print_exc()
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
 
-def test_gaia20_hand_get_joints_pos_vel(ports_config, tests_to_run=None):
+def test_gaiahand20_get_joints_pos_vel(ports_config, tests_to_run=None):
     """
-    测试 GaiaHand20Adapter.get_joints_pos_vel：关节位置(rad)与角速度(rad/s)，协议字典键与 move_joints_pos 一致。
+    Test GaiaHand20Adapter.get_joints_pos_vel: joint position (rad) and angular velocity (rad/s); protocol dict keys match move_joints_pos.
 
-    单手右手：键 ``3`` 为整手位置、``5`` 为整手速度；双手另含 ``4``/``6``（左手）。
-    无参调用返回整手；传入 ``FingerType`` + ``JointType`` 时仅返回该关节（单元素列表）。
+    Single right hand: key 3 = full-hand position, 5 = full-hand velocity; dual-hand adds 4/6 for left hand.
+    No-arg call returns full hand; FingerType + JointType returns that joint only (single-element list).
 
-    连接方式可与 ``test_gaia20_hand_get_joint_positions`` 对齐（串口 / SLCAN、波特率、主控板）。
+    Connection options align with test_gaiahand20_get_joint_positions (serial / SLCAN, baud rate, main board).
 
     Args:
-        ports_config: 串口配置字典
-        tests_to_run: 子测试列表。默认 ``[7]``（与 ``test_gaia20_hand_get_joint_positions`` 测试7 同级：插补过程边运动边读）。
-                     1 — 无参整手读取；2 — 指定拇指第一关节；3 — 运动后再次整手读取对比拇指；
-                     7 — 从当前位置插补到目标位置，每步 ``get_joints_pos_vel`` 读取整手位置(3)与速度(5)。
+        ports_config: Serial port configuration dict
+        tests_to_run: Sub-test list. Default [7] (same tier as test 7 in test_gaiahand20_get_joint_positions: read while interpolating).
+                     1 — full-hand read with no args; 2 — thumb first joint; 3 — full-hand read after motion, compare thumb;
+                     7 — interpolate from current to target, get_joints_pos_vel each step for position (3) and velocity (5).
     """
-    print("\n=== 测试 GaiaHand20 get_joints_pos_vel（位置+速度，协议字典 3/5）===")
+    print("\n=== Test GaiaHand20 get_joints_pos_vel (position+velocity, protocol keys 3/5) ===")
 
     if tests_to_run is None:
         tests_to_run = [7]
     elif not tests_to_run:
         tests_to_run = [1, 2, 3, 7]
 
-    print(f"将要运行的测试: {tests_to_run}")
+    print(f"Tests to run: {tests_to_run}")
 
     if not ports_config or not ports_config['right']:
-        print("未找到可用的右手串口，跳过 get_joints_pos_vel 测试")
+        print("No available right-hand serial port; skipping get_joints_pos_vel test")
         return
 
     hand = None
     try:
-        # 与 test_gaia20_hand_get_joint_positions 相同，可按硬件改为一组实际配置：
-        # hand = create_hand("gaia20", "right", port=ports_config['right'], baudrate=921600, has_main_board=True)
-        # hand = create_hand("gaia20", "right", port=ports_config['right'], baudrate=230400)
-        # hand = create_hand("gaia20", "right", port='COM6', use_slcan=True, has_main_board=True)
-        # hand = create_hand("gaia20", "right", port=ports_config['right'], baudrate=230400)
+        # Same as test_gaiahand20_get_joint_positions; adjust to your hardware:
+        # hand = create_hand("gaiahand20", "right", port=ports_config['right'], baudrate=921600, has_main_board=True)
+        # hand = create_hand("gaiahand20", "right", port=ports_config['right'], baudrate=230400)
+        # hand = create_hand("gaiahand20", "right", port='COM6', use_slcan=True, has_main_board=True)
+        # hand = create_hand("gaiahand20", "right", port=ports_config['right'], baudrate=230400)
 
-        hand = create_hand("gaia20", "right", port='COM6', use_slcan=True, has_main_board=True)
+        hand = create_hand("gaiahand20", "right", port='COM6', use_slcan=True, has_main_board=True)
 
         if not hasattr(hand, 'get_joints_pos_vel'):
-            print("当前适配器未实现 get_joints_pos_vel，跳过")
+            print("Current adapter does not implement get_joints_pos_vel; skipping")
             return
 
         if hand.connect():
-            print(f"GaiaHand20 连接成功 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 Connected (serial port: {ports_config['right']})")
 
-            set_motor_smooth_level(hand, device_id=255, level=3, description="get_joints_pos_vel 测试")
+            set_motor_smooth_level(hand, device_id=255, level=3, description="get_joints_pos_vel test")
 
-            print("上使能所有关节...")
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
 
             time.sleep(0.5)
 
             if 1 in tests_to_run:
-                print("\n--- 测试1：无参整手 get_joints_pos_vel() ---")
+                print("\n--- Test 1: full-hand get_joints_pos_vel() with no args ---")
                 full = hand.get_joints_pos_vel()
-                print(f"返回顶层键: {sorted(full.keys())}")
+                print(f"Top-level keys: {sorted(full.keys())}")
                 for top_key in sorted(full.keys()):
-                    side = {3: "右手位置(rad)", 4: "左手位置(rad)", 5: "右手速度(rad/s)", 6: "左手速度(rad/s)"}.get(
-                        top_key, f"键{top_key}"
+                    side = {3: "right position (rad)", 4: "left position (rad)", 5: "right velocity (rad/s)", 6: "left velocity (rad/s)"}.get(
+                        top_key, f"key {top_key}"
                     )
                     inner = full[top_key]
-                    print(f"  [{top_key}] {side}，手指编号: {sorted(inner.keys())}")
+                    print(f"  [{top_key}] {side}, finger ids: {sorted(inner.keys())}")
                     if 1 in inner:
                         pos_thumb = inner[1]
                         deg = [math.degrees(v) if v is not None else None for v in pos_thumb]
-                        print(f"      拇指各关节（本组数值）: {pos_thumb}")
+                        print(f"      Thumb joints (raw values): {pos_thumb}")
                         if top_key in (3, 4):
-                            print(f"      拇指各关节（度）: {deg}")
+                            print(f"      Thumb joints (deg): {deg}")
 
             if 2 in tests_to_run:
-                # print("\n--- 测试2：指定拇指第一关节 FingerType.THUMB, JointType.JOINT_1 ---")
+                # print("\n--- Test 2: thumb first joint FingerType.THUMB, JointType.JOINT_1 ---")
                 # one = hand.get_joints_pos_vel(FingerType.THUMB, JointType.JOINT_1, timeout=0.2)
-                # print(f"返回: {one}")
+                # print(f"Return: {one}")
                 # for k in sorted(one.keys()):
-                #     label = "位置(rad)" if k in (3, 4) else "速度(rad/s)"
+                #     label = "position (rad)" if k in (3, 4) else "velocity (rad/s)"
                 #     print(f"  [{k}] {label}: {one[k]}")
                 pass
 
             if 3 in tests_to_run:
-                # print("\n--- 测试3：小幅动指后再次整手读取（观察拇指位置/速度变化） ---")
+                # print("\n--- Test 3: re-read full hand after small motion (observe thumb pos/vel change) ---")
                 # before = hand.get_joints_pos_vel()
                 # bump = [
                 #     0.0,
@@ -866,16 +866,16 @@ def test_gaia20_hand_get_joints_pos_vel(ports_config, tests_to_run=None):
                 # time.sleep(1.0)
                 # after = hand.get_joints_pos_vel()
                 # if 3 in before and 3 in after and 1 in before[3] and 1 in after[3]:
-                #     print(f"拇指位置(rad) 运动前: {before[3][1]}")
-                #     print(f"拇指位置(rad) 运动后: {after[3][1]}")
+                #     print(f"Thumb position (rad) before: {before[3][1]}")
+                #     print(f"Thumb position (rad) after: {after[3][1]}")
                 # if 5 in before and 5 in after and 1 in before[5] and 1 in after[5]:
-                #     print(f"拇指速度(rad/s) 运动前: {before[5][1]}")
-                #     print(f"拇指速度(rad/s) 运动后: {after[5][1]}")
+                #     print(f"Thumb velocity (rad/s) before: {before[5][1]}")
+                #     print(f"Thumb velocity (rad/s) after: {after[5][1]}")
                 pass
 
             if 7 in tests_to_run:
                 print(
-                    "\n--- 测试7：插补运动，每步 get_joints_pos_vel（边运动边读角度与角速度，对齐 get_joint_positions 测试7）---"
+                    "\n--- Test 7: interpolation with get_joints_pos_vel each step (read angle and velocity while moving, aligned with get_joint_positions test 7) ---"
                 )
                 target_positions = [
                     0.0,
@@ -895,21 +895,21 @@ def test_gaia20_hand_get_joints_pos_vel(ports_config, tests_to_run=None):
                     math.radians(15.0),
                     math.radians(25.0),
                 ]
-                print("使用异步方式获取初始位置（与插补起点一致）...")
+                print("Getting initial positions asynchronously (same as interpolation start)...")
                 initial_positions = hand.get_joint_positions(sync=False)
-                print(f"初始位置（弧度，前5关节）: {initial_positions[:5] if isinstance(initial_positions, (list, tuple)) else initial_positions}...")
+                print(f"Initial positions (rad, first 5 joints): {initial_positions[:5] if isinstance(initial_positions, (list, tuple)) else initial_positions}...")
                 if isinstance(initial_positions, (list, tuple)) and len(initial_positions) >= 16:
                     print(
-                        f"初始位置（度，前5关节）: {[math.degrees(p) if p is not None else None for p in initial_positions[:5]]}"
+                        f"Initial positions (deg, first 5 joints): {[math.degrees(p) if p is not None else None for p in initial_positions[:5]]}"
                     )
 
                 interpolation_steps = 10
                 step_delay = 0.0
                 print(
-                    f"\n开始插补：当前位置 → 目标位置，共 {interpolation_steps} 步，每步后读 get_joints_pos_vel，步间延迟 {step_delay}s"
+                    f"\nStarting interpolation: current position -> target position, {interpolation_steps} steps, get_joints_pos_vel after each step, delay {step_delay}s between steps"
                 )
                 print(
-                    f"目标位置（度，前5关节）: {[math.degrees(p) if p is not None else None for p in target_positions[:5]]}"
+                    f"Target positions (deg, first 5 joints): {[math.degrees(p) if p is not None else None for p in target_positions[:5]]}"
                 )
 
                 for step in range(interpolation_steps + 1):
@@ -929,506 +929,506 @@ def test_gaia20_hand_get_joints_pos_vel(ports_config, tests_to_run=None):
 
                     success = hand.move_joints_pos(interpolated_positions, speed=0.8, use_broadcast=True)
                     if not success:
-                        print(f"警告：第 {step} 步设置位置失败")
+                        print(f"Warning: failed to set position at step {step}")
 
                     pv = hand.get_joints_pos_vel(timeout=0.025)
                     if step % 10 == 0 or step == interpolation_steps:
-                        print(f"\n步骤 {step}/{interpolation_steps} (进度 {t * 100:.1f}%):")
+                        print(f"\nStep {step}/{interpolation_steps} (progress {t * 100:.1f}%):")
                         if 3 in pv and 1 in pv[3]:
                             pos_deg = [math.degrees(x) if x is not None else None for x in pv[3][1]]
-                            print(f"  拇指位置（度，协议键3）: {pos_deg}")
+                            print(f"  Thumb position (deg, protocol key 3): {pos_deg}")
                         if 5 in pv and 1 in pv[5]:
                             vel_dps = [math.degrees(w) if w is not None else None for w in pv[5][1]]
-                            print(f"  拇指角速度（°/s，协议键5，由 rad/s 换算）: {vel_dps}")
+                            print(f"  Thumb angular velocity (deg/s, protocol key 5, converted from rad/s): {vel_dps}")
 
-                print("\n插补完成。最终整手 get_joints_pos_vel：")
+                print("\nInterpolation complete. Final full-hand get_joints_pos_vel:")
                 final_pv = hand.get_joints_pos_vel(timeout=0.1)
                 if 3 in final_pv and 5 in final_pv and 1 in final_pv[3]:
                     fd = [math.degrees(x) if x is not None else None for x in final_pv[3][1]]
                     td = [math.degrees(p) if p is not None else None for p in target_positions[:4]]
-                    print(f"  拇指最终位置（度）: {fd}")
-                    print(f"  拇指目标位置（度）: {td}")
+                    print(f"  Thumb final position (deg): {fd}")
+                    print(f"  Thumb target position (deg): {td}")
                 time.sleep(1)
 
         else:
-            print(f"GaiaHand20 连接失败 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 connection failed (serial port: {ports_config['right']})")
 
     except Exception as e:
-        print(f"GaiaHand20 get_joints_pos_vel 测试失败: {e}")
+        print(f"GaiaHand20 get_joints_pos_vel test failed: {e}")
         import traceback
 
         traceback.print_exc()
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             try:
                 hand.hand_zero()
                 time.sleep(1)
             except Exception:
                 pass
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
 
-def test_gaia20_hand_move_joints_pos_list(ports_config):
+def test_gaiahand20_move_joints_pos_list(ports_config):
     """
-    测试 GaiaHand20 的 move_joints_pos 功能（列表格式，16关节版本）
+    Test GaiaHand20 move_joints_pos (list format, 16-joint version)
     
-    ⭐ 推荐使用：Gaia20当前主要维护版本
+    ⭐ Recommended: GaiaHand20 is the currently maintained version
     
-    波特率配置：
-    - 不带主控板版本：230400（此函数使用的配置）
-    - 带主控板版本：921600（高性能配置，请使用 test_gaia20_hand_smooth_transition() 查看示例）
+    Baud rate:
+    - Without main board: 230400 (used by this function)
+    - With main board: 921600 (high-performance; see test_gaiahand20_smooth_transition())
     """
-    print("\n=== 测试 GaiaHand20 move_joints_pos 功能（列表格式，16关节版本）===")
+    print("\n=== Test GaiaHand20 move_joints_pos (list format, 16-joint version) ===")
     
     if not ports_config or not ports_config['right']:
-        print("未找到可用的右手串口，跳过单手测试")
+        print("No available right-hand serial port; skipping single-hand test")
         return
     
     hand = None
     try:
-        # 创建右手 GaiaHand20 实例
-        hand = create_hand("gaia20", "right", port=ports_config['right'], baudrate=230400)
+        # Create right-hand GaiaHand20 instance
+        hand = create_hand("gaiahand20", "right", port=ports_config['right'], baudrate=230400)
 
         if hand.connect():
-            print(f"GaiaHand20 连接成功 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 Connected (serial port: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 平滑等级范围：0-5，数值越大平滑效果越好
-            set_motor_smooth_level(hand, device_id=255, level=3, description="连接后初始化")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Smoothing range 0-5; higher is smoother
+            set_motor_smooth_level(hand, device_id=255, level=3, description="post-connect init")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(1)
             
-            # 测试单手模式 - 16个关节位置
-            print("\n--- 测试单手模式（16关节） ---")
+            # Test single-hand mode — 16 joint positions
+            print("\n--- Test single-hand mode (16 joints) ---")
             
-            # 创建16关节位置数据：拇指4关节，其他手指各3关节（弧度制）
+            # Build 16-joint position list: thumb 4 joints, others 3 each (radians)
             custom_positions_16 = [
-                # 拇指的4个关节
+                # Thumb 4 joints
                 0.0, math.radians(10.0), math.radians(10.0), math.radians(10.0),
-                # 食指的3个关节
+                # Index 3 joints
                 0.0, math.radians(10.0), math.radians(10.0),
-                # 中指的3个关节
+                # Middle 3 joints
                 0.0, math.radians(13.0), math.radians(15.0),
-                # 无名指的3个关节
+                # Ring 3 joints
                 0.0, math.radians(18.0), math.radians(10.0),
-                # 小指的3个关节
+                # Little 3 joints
                 0.0, math.radians(19.0), math.radians(10.0)
             ]
             
-            print(f"设置16关节位置数据: {custom_positions_16}")
+            print(f"Setting 16-joint position data: {custom_positions_16}")
             success = hand.move_joints_pos(custom_positions_16, speed=1, use_broadcast=True)
-            print(f"16关节位置结果: {'成功' if success else '失败'}")
+            print(f"16-joint position result: {'succeeded' if success else 'failed'}")
             
-            # 等待2秒
+            # Wait 2 seconds
             time.sleep(1)
             
-            # 测试拇指独立运动（4关节）
-            print("\n--- 测试拇指独立运动（4关节） ---")
+            # Test thumb-only motion (4 joints)
+            print("\n--- Test thumb independent motion (4 joints) ---")
             
             thumb_positions = [
-                # 拇指的4个关节（弧度制）
+                # Thumb 4 joints (radians)
                 math.radians(10.0), math.radians(30.0), math.radians(45.0), math.radians(25.0),
-                # 其他手指保持不动
-                0.0, 0.0, 0.0,  # 食指
-                0.0, 0.0, 0.0,  # 中指
-                0.0, 0.0, 0.0,  # 无名指
-                0.0, 0.0, 0.0   # 小指
+                # Other fingers held still
+                0.0, 0.0, 0.0,  # Index
+                0.0, 0.0, 0.0,  # Middle
+                0.0, 0.0, 0.0,  # Ring
+                0.0, 0.0, 0.0   # Little
             ]
             
-            print("执行拇指弯曲运动...")
+            print("Executing thumb flex motion...")
             success = hand.move_joints_pos(thumb_positions, speed=0.8, use_broadcast=True)
-            print(f"拇指运动结果: {'成功' if success else '失败'}")
+            print(f"Thumb motion result: {'succeeded' if success else 'failed'}")
             
             time.sleep(1)
             
-            # 回零
-            print("执行回零操作...")
+            # Homing
+            print("Executing homing...")
             success = hand.hand_zero()
-            print(f"回零结果: {'成功' if success else '失败'}")
+            print(f"Homing result: {'succeeded' if success else 'failed'}")
             time.sleep(1)
             
         else:
-            print(f"GaiaHand20 连接失败 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 connection failed (serial port: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand20 测试失败: {e}")
+        print(f"GaiaHand20 test failed: {e}")
         import traceback
         traceback.print_exc()
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
 
-def test_gaia20_hand_move_joints_pos_dict(ports_config):
+def test_gaiahand20_move_joints_pos_dict(ports_config):
     """
-    测试 GaiaHand20 的 move_joints_pos 功能（字典格式，16关节版本）
+    Test GaiaHand20 move_joints_pos (dict format, 16-joint version)
     
-    ⭐ 推荐使用：Gaia20当前主要维护版本
+    ⭐ Recommended: GaiaHand20 is the currently maintained version
     
-    波特率配置：230400（不带主控板版本）
+    Baud rate: 230400 (without main board)
     """
-    print("\n=== 测试 GaiaHand20 move_joints_pos 功能（字典格式，16关节版本）===")
+    print("\n=== Test GaiaHand20 move_joints_pos (dict format, 16-joint version) ===")
     
     if not ports_config or not ports_config['right']:
-        print("未找到可用的右手串口，跳过字典格式测试")
+        print("No available right-hand serial port; skipping dict-format test")
         return
     
     hand = None
     try:
-        # 创建右手 GaiaHand20 实例
-        # ⭐ 波特率配置：230400（不带主控板版本）
-        # 如果使用带主控板版本，请修改为：baudrate=921600
-        hand = create_hand("gaia20", "right", port=ports_config['right'], baudrate=230400)
+        # Create right-hand GaiaHand20 instance
+        # ⭐ Baud rate: 230400 (without main board)
+        # For main-board hardware, use baudrate=921600
+        hand = create_hand("gaiahand20", "right", port=ports_config['right'], baudrate=230400)
 
         if hand.connect():
-            print(f"GaiaHand20 连接成功 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 Connected (serial port: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 平滑等级范围：0-5，数值越大平滑效果越好
-            set_motor_smooth_level(hand, device_id=255, level=3, description="连接后初始化")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Smoothing range 0-5; higher is smoother
+            set_motor_smooth_level(hand, device_id=255, level=3, description="post-connect init")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(1)
             
-            # 测试1：使用字典格式设置右手位置（单手模式）
-            print("\n--- 测试1：字典格式设置右手位置（单手模式） ---")
+            # Test 1: set right-hand positions via dict (single-hand mode)
+            print("\n--- Test 1: set right-hand positions in dict format (single-hand mode) ---")
             right_hand_data = {
-                1: [0.0, math.radians(10.0), math.radians(10.0), math.radians(10.0)],  # 拇指（4个关节，弧度制）
-                2: [0.0, math.radians(10.0), math.radians(10.0)],  # 食指（3个关节，弧度制）
-                3: [0.0, math.radians(13.0), math.radians(15.0)],  # 中指（3个关节，弧度制）
-                4: [0.0, math.radians(18.0), math.radians(10.0)],  # 无名指（3个关节，弧度制）
-                5: [0.0, math.radians(19.0), math.radians(10.0)]   # 小指（3个关节，弧度制）
+                1: [0.0, math.radians(10.0), math.radians(10.0), math.radians(10.0)],  # Thumb (4 joints, radians)
+                2: [0.0, math.radians(10.0), math.radians(10.0)],  # Index (3 joints, radians)
+                3: [0.0, math.radians(13.0), math.radians(15.0)],  # Middle (3 joints, radians)
+                4: [0.0, math.radians(18.0), math.radians(10.0)],  # Ring (3 joints, radians)
+                5: [0.0, math.radians(19.0), math.radians(10.0)]   # Little (3 joints, radians)
             }
             
-            positions_dict = {1: right_hand_data}  # 1=右手
-            print(f"设置右手位置数据（字典格式，弧度制）")
-            print(f"  拇指: {right_hand_data[1]}")
-            print(f"  食指: {right_hand_data[2]}")
-            print(f"  中指: {right_hand_data[3]}")
-            print(f"  无名指: {right_hand_data[4]}")
-            print(f"  小指: {right_hand_data[5]}")
+            positions_dict = {1: right_hand_data}  # 1 = right hand
+            print(f"Setting right-hand position data (dict format, radians)")
+            print(f"  Thumb: {right_hand_data[1]}")
+            print(f"  Index: {right_hand_data[2]}")
+            print(f"  Middle: {right_hand_data[3]}")
+            print(f"  Ring: {right_hand_data[4]}")
+            print(f"  Little: {right_hand_data[5]}")
             
             success = hand.move_joints_pos(positions_dict, speed=1, use_broadcast=True)
-            print(f"字典格式设置结果: {'成功' if success else '失败'}")
+            print(f"Dict-format set result: {'succeeded' if success else 'failed'}")
             
             if success:
                 time.sleep(1)
-                # 获取当前位置验证
+                # Read current positions to verify
                 current_positions = hand.get_joint_positions()
-                print(f"当前位置: {current_positions}")
+                print(f"Current positions: {current_positions}")
             
-            # 测试2：使用字典格式设置拇指弯曲
-            print("\n--- 测试2：字典格式设置拇指弯曲 ---")
+            # Test 2: set thumb flex via dict
+            print("\n--- Test 2: set thumb flex in dict format ---")
             thumb_bend_data = {
-                1: [math.radians(10.0), math.radians(30.0), math.radians(45.0), math.radians(25.0)],  # 拇指弯曲（4个关节，弧度制）
-                2: [0.0, 0.0, 0.0],  # 食指保持不动
-                3: [0.0, 0.0, 0.0],  # 中指保持不动
-                4: [0.0, 0.0, 0.0],  # 无名指保持不动
-                5: [0.0, 0.0, 0.0]   # 小指保持不动
+                1: [math.radians(10.0), math.radians(30.0), math.radians(45.0), math.radians(25.0)],  # Thumb flex (4 joints, radians)
+                2: [0.0, 0.0, 0.0],  # Index held still
+                3: [0.0, 0.0, 0.0],  # Middle held still
+                4: [0.0, 0.0, 0.0],  # Ring held still
+                5: [0.0, 0.0, 0.0]   # Little held still
             }
             
             positions_dict = {1: thumb_bend_data}
-            print(f"设置拇指弯曲（字典格式，弧度制）")
+            print(f"Setting thumb flex (dict format, radians)")
             success = hand.move_joints_pos(positions_dict, speed=0.8, use_broadcast=True)
-            print(f"拇指弯曲设置结果: {'成功' if success else '失败'}")
+            print(f"Thumb flex set result: {'succeeded' if success else 'failed'}")
             
             time.sleep(1)
             
-            # 测试3：使用字典格式回零（所有关节伸直）
-            print("\n--- 测试3：字典格式回零（所有关节伸直） ---")
+            # Test 3: homing via dict (all joints extended)
+            print("\n--- Test 3: homing in dict format (all joints extended) ---")
             zero_data = {
-                1: [0.0, 0.0, 0.0, 0.0],  # 拇指（4个关节）
-                2: [0.0, 0.0, 0.0],  # 食指（3个关节）
-                3: [0.0, 0.0, 0.0],  # 中指（3个关节）
-                4: [0.0, 0.0, 0.0],  # 无名指（3个关节）
-                5: [0.0, 0.0, 0.0]   # 小指（3个关节）
+                1: [0.0, 0.0, 0.0, 0.0],  # Thumb (4 joints)
+                2: [0.0, 0.0, 0.0],  # Index (3 joints)
+                3: [0.0, 0.0, 0.0],  # Middle (3 joints)
+                4: [0.0, 0.0, 0.0],  # Ring (3 joints)
+                5: [0.0, 0.0, 0.0]   # Little (3 joints)
             }
             
             positions_dict = {1: zero_data}
-            print("执行回零操作（字典格式）...")
+            print("Executing homing (dict format)...")
             success = hand.move_joints_pos(positions_dict, speed=1, use_broadcast=True)
-            print(f"回零结果: {'成功' if success else '失败'}")
+            print(f"Homing result: {'succeeded' if success else 'failed'}")
             
             time.sleep(1)
             
-            # 测试4：指令6格式测试（单个关节控制）
-            print("\n--- 测试4：指令6格式测试（单个关节控制） ---")
-            # 指令6格式：6: [手部, 手指, 关节, 位置值(弧度)]
-            # 右手，拇指，第2个关节，30度（弧度制）
+            # Test 4: command-6 format (single joint control)
+            print("\n--- Test 4: command-6 format (single joint control) ---")
+            # Command 6 format: 6: [hand, finger, joint, position (rad)]
+            # Right hand, thumb, joint 2, 30 deg (radians)
             command_6_data = [1, 1, 2, math.radians(30.0)]
             positions_dict = {6: command_6_data}
             
-            print(f"指令6数据: 右手(1), 拇指(1), 关节2, 角度{math.degrees(math.radians(30.0)):.1f}度")
+            print(f"Command 6 data: right hand(1), thumb(1), joint 2, angle {math.degrees(math.radians(30.0)):.1f} deg")
             success = hand.move_joints_pos(positions_dict, speed=0.8, use_broadcast=False)
-            print(f"指令6设置结果: {'成功' if success else '失败'}")
+            print(f"Command 6 set result: {'succeeded' if success else 'failed'}")
             
             time.sleep(1)
 
-            # 回零
-            print("执行回零操作...")
+            # Homing
+            print("Executing homing...")
             success = hand.hand_zero()
-            print(f"回零结果: {'成功' if success else '失败'}")
+            print(f"Homing result: {'succeeded' if success else 'failed'}")
             time.sleep(1)
             
         else:
-            print(f"GaiaHand20 连接失败 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 connection failed (serial port: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand20 字典格式测试失败: {e}")
+        print(f"GaiaHand20 dict-format test failed: {e}")
         import traceback
         traceback.print_exc()
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
 
-def test_gaia20_hand_double_move_joints_pos_dict(ports_config):
+def test_gaiahand20_double_move_joints_pos_dict(ports_config):
     """
-    测试 GaiaHand20 双手模式的 move_joints_pos 功能（字典格式，32关节）
+    Test GaiaHand20 dual-hand move_joints_pos (dict format, 32 joints)
     
-    ⭐ 推荐使用：Gaia20当前主要维护版本
+    ⭐ Recommended: GaiaHand20 is the currently maintained version
     
-    波特率配置：230400（不带主控板版本）
+    Baud rate: 230400 (without main board)
     """
-    print("\n=== 测试 GaiaHand20 双手模式 move_joints_pos 功能（字典格式，32关节）===")
+    print("\n=== Test GaiaHand20 dual-hand move_joints_pos (dict format, 32 joints) ===")
     
     if not ports_config or not ports_config['left'] or not ports_config['right']:
-        print("未找到可用的左右手串口，跳过双手字典格式测试")
+        print("No available left/right serial ports; skipping dual-hand dict-format test")
         return
     
     hand = None
     try:
-        # 创建双手 GaiaHand20 实例
-        # ⭐ 波特率配置：230400（不带主控板版本，默认配置）
-        # 如果使用带主控板版本，需要在create_hand中添加baudrate=921600参数
-        hand = create_hand("gaia20", "double", left_port=ports_config['left'], right_port=ports_config['right'])
+        # Create dual-hand GaiaHand20 instance
+        # ⭐ Baud rate: 230400 (without main board, default)
+        # For main-board hardware, pass baudrate=921600 to create_hand
+        hand = create_hand("gaiahand20", "double", left_port=ports_config['left'], right_port=ports_config['right'])
         
         if hand.connect():
-            print(f"GaiaHand20 双手模式连接成功 (左手: {ports_config['left']}, 右手: {ports_config['right']})")
+            print(f"GaiaHand20 dual-hand connected (left: {ports_config['left']}, right: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 平滑等级范围：0-5，数值越大平滑效果越好
-            set_motor_smooth_level(hand, device_id=255, level=3, description="连接后初始化")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Smoothing range 0-5; higher is smoother
+            set_motor_smooth_level(hand, device_id=255, level=3, description="post-connect init")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(1)
             
-            # 测试1：使用字典格式设置双手位置
-            print("\n--- 测试1：字典格式设置双手位置 ---")
+            # Test 1: set dual-hand positions via dict
+            print("\n--- Test 1: set dual-hand positions in dict format ---")
             right_hand_data = {
-                1: [0.0, math.radians(20.0), math.radians(30.0), math.radians(15.0)],  # 拇指（4个关节，弧度制）
-                2: [0.0, math.radians(40.0), math.radians(55.0)],  # 食指（3个关节，弧度制）
-                3: [0.0, math.radians(35.0), math.radians(45.0)],  # 中指（3个关节，弧度制）
-                4: [0.0, math.radians(30.0), math.radians(40.0)],  # 无名指（3个关节，弧度制）
-                5: [0.0, math.radians(25.0), math.radians(35.0)]   # 小指（3个关节，弧度制）
+                1: [0.0, math.radians(20.0), math.radians(30.0), math.radians(15.0)],  # Thumb (4 joints, radians)
+                2: [0.0, math.radians(40.0), math.radians(55.0)],  # Index (3 joints, radians)
+                3: [0.0, math.radians(35.0), math.radians(45.0)],  # Middle (3 joints, radians)
+                4: [0.0, math.radians(30.0), math.radians(40.0)],  # Ring (3 joints, radians)
+                5: [0.0, math.radians(25.0), math.radians(35.0)]   # Little (3 joints, radians)
             }
             
             left_hand_data = {
-                1: [0.0, math.radians(20.0), math.radians(30.0), math.radians(15.0)],  # 拇指（4个关节，弧度制）
-                2: [0.0, math.radians(40.0), math.radians(55.0)],  # 食指（3个关节，弧度制）
-                3: [0.0, math.radians(35.0), math.radians(45.0)],  # 中指（3个关节，弧度制）
-                4: [0.0, math.radians(30.0), math.radians(40.0)],  # 无名指（3个关节，弧度制）
-                5: [0.0, math.radians(25.0), math.radians(35.0)]   # 小指（3个关节，弧度制）
+                1: [0.0, math.radians(20.0), math.radians(30.0), math.radians(15.0)],  # Thumb (4 joints, radians)
+                2: [0.0, math.radians(40.0), math.radians(55.0)],  # Index (3 joints, radians)
+                3: [0.0, math.radians(35.0), math.radians(45.0)],  # Middle (3 joints, radians)
+                4: [0.0, math.radians(30.0), math.radians(40.0)],  # Ring (3 joints, radians)
+                5: [0.0, math.radians(25.0), math.radians(35.0)]   # Little (3 joints, radians)
             }
             
             positions_dict = {
-                1: right_hand_data,  # 1=右手
-                2: left_hand_data    # 2=左手
+                1: right_hand_data,  # 1 = right hand
+                2: left_hand_data    # 2 = left hand
             }
             
-            print(f"设置双手位置数据（字典格式，弧度制）")
-            print(f"  右手拇指: {right_hand_data[1]}")
-            print(f"  左手拇指: {left_hand_data[1]}")
+            print(f"Setting dual-hand position data (dict format, radians)")
+            print(f"  Right thumb: {right_hand_data[1]}")
+            print(f"  Left thumb: {left_hand_data[1]}")
             
             success = hand.move_joints_pos(positions_dict, speed=0.5, use_broadcast=True)
-            print(f"双手字典格式设置结果: {'成功' if success else '失败'}")
+            print(f"Dual-hand dict-format set result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
-            # 测试2：使用字典格式设置不同手势
-            print("\n--- 测试2：字典格式设置不同手势 ---")
-            # 右手：拇指弯曲
+            # Test 2: set different gestures via dict
+            print("\n--- Test 2: set different gestures in dict format ---")
+            # Right hand: thumb flex
             right_custom = {
-                1: [math.radians(5.0), math.radians(25.0), math.radians(40.0), math.radians(20.0)],  # 拇指弯曲（4个关节，弧度制）
-                2: [0.0, 0.0, 0.0],  # 食指保持不动
-                3: [0.0, 0.0, 0.0],  # 中指保持不动
-                4: [0.0, 0.0, 0.0],  # 无名指保持不动
-                5: [0.0, 0.0, 0.0]   # 小指保持不动
+                1: [math.radians(5.0), math.radians(25.0), math.radians(40.0), math.radians(20.0)],  # Thumb flex (4 joints, radians)
+                2: [0.0, 0.0, 0.0],  # Index held still
+                3: [0.0, 0.0, 0.0],  # Middle held still
+                4: [0.0, 0.0, 0.0],  # Ring held still
+                5: [0.0, 0.0, 0.0]   # Little held still
             }
             
-            # 左手：食指弯曲
+            # Left hand: index flex
             left_custom = {
-                1: [0.0, 0.0, 0.0, 0.0],  # 拇指保持不动
-                2: [0.0, math.radians(45.0), math.radians(60.0)],  # 食指弯曲（3个关节，弧度制）
-                3: [0.0, 0.0, 0.0],  # 中指保持不动
-                4: [0.0, 0.0, 0.0],  # 无名指保持不动
-                5: [0.0, 0.0, 0.0]   # 小指保持不动
+                1: [0.0, 0.0, 0.0, 0.0],  # Thumb held still
+                2: [0.0, math.radians(45.0), math.radians(60.0)],  # Index flex (3 joints, radians)
+                3: [0.0, 0.0, 0.0],  # Middle held still
+                4: [0.0, 0.0, 0.0],  # Ring held still
+                5: [0.0, 0.0, 0.0]   # Little held still
             }
             
             positions_dict = {
-                1: right_custom,  # 右手
-                2: left_custom     # 左手
+                1: right_custom,  # Right hand
+                2: left_custom     # Left hand
             }
             
-            print(f"设置自定义双手位置: 右手拇指弯曲，左手食指弯曲（字典格式，弧度制）")
+            print(f"Setting custom dual-hand positions: right thumb flex, left index flex (dict format, radians)")
             success = hand.move_joints_pos(positions_dict, speed=0.5, use_broadcast=True)
-            print(f"自定义双手位置结果: {'成功' if success else '失败'}")
+            print(f"Custom dual-hand position result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
-            # 测试3：使用字典格式回零（双手张开）
-            print("\n--- 测试3：字典格式回零（双手张开） ---")
+            # Test 3: homing via dict (dual-hand open)
+            print("\n--- Test 3: homing in dict format (dual-hand open) ---")
             zero_data = {
-                1: [0.0, 0.0, 0.0, 0.0],  # 拇指（4个关节）
-                2: [0.0, 0.0, 0.0],  # 食指（3个关节）
-                3: [0.0, 0.0, 0.0],  # 中指（3个关节）
-                4: [0.0, 0.0, 0.0],  # 无名指（3个关节）
-                5: [0.0, 0.0, 0.0]   # 小指（3个关节）
+                1: [0.0, 0.0, 0.0, 0.0],  # Thumb (4 joints)
+                2: [0.0, 0.0, 0.0],  # Index (3 joints)
+                3: [0.0, 0.0, 0.0],  # Middle (3 joints)
+                4: [0.0, 0.0, 0.0],  # Ring (3 joints)
+                5: [0.0, 0.0, 0.0]   # Little (3 joints)
             }
             
             positions_dict = {
-                1: zero_data,  # 右手
-                2: zero_data   # 左手
+                1: zero_data,  # Right hand
+                2: zero_data   # Left hand
             }
             
-            print("执行双手回零操作（字典格式）...")
+            print("Executing dual-hand homing (dict format)...")
             success = hand.move_joints_pos(positions_dict, speed=0.5, use_broadcast=True)
-            print(f"双手回零结果: {'成功' if success else '失败'}")
+            print(f"Dual-hand homing result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
         else:
-            print(f"GaiaHand20 双手模式连接失败 (左手: {ports_config['left']}, 右手: {ports_config['right']})")
+            print(f"GaiaHand20 dual-hand connection failed (left: {ports_config['left']}, right: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand20 双手模式字典格式测试失败: {e}")
+        print(f"GaiaHand20 dual-hand dict-format test failed: {e}")
         import traceback
         traceback.print_exc()
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
 
-def test_gaia20_hand_smooth_transition(ports_config):
+def test_gaiahand20_smooth_transition(ports_config):
     """
-    测试 GaiaHand20 平滑过渡功能（16关节版本）
+    Test GaiaHand20 smooth transition (16-joint version)
     
-    ⭐ 推荐使用：Gaia20当前主要维护版本
+    ⭐ Recommended: GaiaHand20 is the currently maintained version
     
-    波特率配置：921600（带主控板版本，高性能配置）
+    Baud rate: 921600 (with main board, high-performance)
     """
-    print("\n=== 测试 GaiaHand20 平滑过渡功能（16关节版本）===")
+    print("\n=== Test GaiaHand20 smooth transition (16-joint version) ===")
     
     if not ports_config or not ports_config['right']:
-        print("未找到可用的右手串口，跳过平滑过渡测试")
+        print("No available right-hand serial port; skipping smooth transition test")
         return
     
     hand = None
     try:
-        # 创建右手 GaiaHand20 实例
-        # ⭐ 波特率配置：921600（带主控板版本，高性能配置）
-        # 如果使用不带主控板版本，请修改为：baudrate=230400
-        hand = create_hand("gaia20", "right", port=ports_config['right'], baudrate=921600)
+        # Create right-hand GaiaHand20 instance
+        # ⭐ Baud rate: 921600 (with main board, high-performance)
+        # Without main board, use baudrate=230400
+        hand = create_hand("gaiahand20", "right", port=ports_config['right'], baudrate=921600)
         
         if hand.connect():
-            print(f"GaiaHand20 连接成功，开始平滑过渡测试 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 connected, starting smooth transition test (serial port: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 平滑等级范围：0-5，数值越大平滑效果越好
-            set_motor_smooth_level(hand, device_id=255, level=3, description="连接后初始化")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Smoothing range 0-5; higher is smoother
+            set_motor_smooth_level(hand, device_id=255, level=3, description="post-connect init")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(1)
             
-            # 创建起始和结束位置（弧度制）
+            # Define start and end positions (radians)
             start_positions_16 = [0.0] * 16
             end_positions_16 = [
-                # 拇指的4个关节
+                # Thumb 4 joints
                 0.0, math.radians(20.0), math.radians(35.0), math.radians(18.0),
-                # 食指的3个关节
+                # Index 3 joints
                 0.0, math.radians(43.0), math.radians(56.0),
-                # 中指的3个关节
+                # Middle 3 joints
                 0.0, math.radians(33.0), math.radians(25.0),
-                # 无名指的3个关节
+                # Ring 3 joints
                 0.0, math.radians(28.0), math.radians(18.0),
-                # 小指的3个关节
+                # Little 3 joints
                 0.0, math.radians(19.0), math.radians(26.0)
             ]
             
-            print("执行平滑过渡：从伸直状态到弯曲状态")
+            print("Running smooth transition: extended to flexed")
             
-            # 分8步过渡
+            # Transition in 8 steps
             for i in range(9):
                 t = i / 8.0
                 positions = []
@@ -1436,18 +1436,18 @@ def test_gaia20_hand_smooth_transition(ports_config):
                     pos = start_positions_16[j] + (end_positions_16[j] - start_positions_16[j]) * t
                     positions.append(pos)
                 
-                print(f"步骤 {i+1}/9: 过渡进度 {t*100:.1f}%")
+                print(f"Step {i+1}/9: transition progress {t*100:.1f}%")
                 hand.move_joints_pos(positions, speed=0.5, use_broadcast=True)
                 time.sleep(0.1)
                 current_positions = hand.get_joint_positions()
-                print(f"当前关节位置: {current_positions}")
+                print(f"Current joint positions: {current_positions}")
 
-            print("平滑过渡完成")
+            print("Smooth transition complete")
             
             time.sleep(2)
             
-            # 反向过渡：从弯曲状态到伸直状态
-            print("执行反向过渡：从弯曲状态到伸直状态")
+            # Reverse transition: flexed to extended
+            print("Running reverse transition: flexed to extended")
             
             for i in range(10):
                 t = i / 10.0
@@ -1456,301 +1456,301 @@ def test_gaia20_hand_smooth_transition(ports_config):
                     pos = end_positions_16[j] + (start_positions_16[j] - end_positions_16[j]) * t
                     positions.append(pos)
                 
-                print(f"步骤 {i+1}/10: 过渡进度 {t*100:.1f}%")
+                print(f"Step {i+1}/10: transition progress {t*100:.1f}%")
                 hand.move_joints_pos(positions, speed=0.5, use_broadcast=True)
                 time.sleep(0.1)
                 current_positions = hand.get_joint_positions()
-                print(f"当前关节位置: {current_positions}")
+                print(f"Current joint positions: {current_positions}")
             
-            print("反向过渡完成")
+            print("Reverse transition complete")
 
             time.sleep(2)
             
         else:
-            print(f"GaiaHand20 连接失败 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 connection failed (serial port: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand20 平滑过渡测试失败: {e}")
+        print(f"GaiaHand20 smooth transition test failed: {e}")
         import traceback
         traceback.print_exc()
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
 
-def test_gaia20_hand_double_move_joints_pos(ports_config):
+def test_gaiahand20_double_move_joints_pos(ports_config):
     """
-    测试 GaiaHand20 双手模式的 move_joints_pos 功能（32关节）
+    Test GaiaHand20 dual-hand move_joints_pos (32 joints)
     
-    ⭐ 推荐使用：Gaia20当前主要维护版本
+    ⭐ Recommended: GaiaHand20 is the currently maintained version
     
-    波特率配置：230400（不带主控板版本）
+    Baud rate: 230400 (without main board)
     """
-    print("\n=== 测试 GaiaHand20 双手模式 move_joints_pos 功能（32关节）===")
+    print("\n=== Test GaiaHand20 dual-hand move_joints_pos (32 joints) ===")
     
     if not ports_config or not ports_config['left'] or not ports_config['right']:
-        print("未找到可用的左右手串口，跳过双手测试")
+        print("No available left/right serial ports; skipping dual-hand test")
         return
     
     hand = None
     try:
-        # 创建双手 GaiaHand20 实例
-        # ⭐ 波特率配置：230400（不带主控板版本，默认配置）
-        # 如果使用带主控板版本，需要在create_hand中添加baudrate=921600参数
-        hand = create_hand("gaia20", "double", left_port=ports_config['left'], right_port=ports_config['right'])
+        # Create dual-hand GaiaHand20 instance
+        # ⭐ Baud rate: 230400 (without main board, default)
+        # For main-board hardware, pass baudrate=921600 to create_hand
+        hand = create_hand("gaiahand20", "double", left_port=ports_config['left'], right_port=ports_config['right'])
         
         if hand.connect():
-            print(f"GaiaHand20 双手模式连接成功 (左手: {ports_config['left']}, 右手: {ports_config['right']})")
+            print(f"GaiaHand20 dual-hand connected (left: {ports_config['left']}, right: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 平滑等级范围：0-5，数值越大平滑效果越好
-            set_motor_smooth_level(hand, device_id=255, level=3, description="连接后初始化")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Smoothing range 0-5; higher is smoother
+            set_motor_smooth_level(hand, device_id=255, level=3, description="post-connect init")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(1)
             
-            # 测试双手模式 - 32个关节位置
-            print("\n--- 测试双手模式（32关节） ---")
+            # Test dual-hand mode — 32 joint positions
+            print("\n--- Test dual-hand mode (32 joints) ---")
             
-            # 创建32关节测试位置数据（弧度制）
+            # Build 32-joint test positions (radians)
             right_positions_16 = [
-                # 拇指的4个关节
+                # Thumb 4 joints
                 0.0, math.radians(20.0), math.radians(30.0), math.radians(15.0),
-                # 其他手指
-                0.0, math.radians(40.0), math.radians(55.0),  # 食指
-                0.0, math.radians(35.0), math.radians(45.0),  # 中指
-                0.0, math.radians(30.0), math.radians(40.0),  # 无名指
-                0.0, math.radians(25.0), math.radians(35.0)   # 小指
+                # Other fingers
+                0.0, math.radians(40.0), math.radians(55.0),  # Index
+                0.0, math.radians(35.0), math.radians(45.0),  # Middle
+                0.0, math.radians(30.0), math.radians(40.0),  # Ring
+                0.0, math.radians(25.0), math.radians(35.0)   # Little
             ]
             left_positions_16 = [
-                # 拇指的4个关节
+                # Thumb 4 joints
                 0.0, math.radians(20.0), math.radians(30.0), math.radians(15.0),
-                # 其他手指
-                0.0, math.radians(40.0), math.radians(55.0),  # 食指
-                0.0, math.radians(35.0), math.radians(45.0),  # 中指
-                0.0, math.radians(30.0), math.radians(40.0),  # 无名指
-                0.0, math.radians(25.0), math.radians(35.0)   # 小指
+                # Other fingers
+                0.0, math.radians(40.0), math.radians(55.0),  # Index
+                0.0, math.radians(35.0), math.radians(45.0),  # Middle
+                0.0, math.radians(30.0), math.radians(40.0),  # Ring
+                0.0, math.radians(25.0), math.radians(35.0)   # Little
             ]
             double_positions_32 = right_positions_16 + left_positions_16
             
-            print(f"设置双手32关节位置数据")
+            print(f"Setting dual-hand 32-joint position data")
             
-            # 使用广播模式
+            # Use broadcast mode
             success = hand.move_joints_pos(double_positions_32, speed=0.5, use_broadcast=True)
-            print(f"双手32关节广播模式结果: {'成功' if success else '失败'}")
+            print(f"Dual-hand 32-joint broadcast result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
-            # 测试双手模式 - 自定义位置数据
-            print("\n--- 测试双手模式（自定义位置） ---")
+            # Test dual-hand mode — custom positions
+            print("\n--- Test dual-hand mode (custom positions) ---")
             
-            # 右手：拇指弯曲（弧度制）
+            # Right hand: thumb flex (radians)
             right_custom = [
-                # 拇指的4个关节
+                # Thumb 4 joints
                 math.radians(5.0), math.radians(25.0), math.radians(40.0), math.radians(20.0),
-                # 其他手指
-                0.0, 0.0, 0.0,  # 食指
-                0.0, 0.0, 0.0,  # 中指
-                0.0, 0.0, 0.0,  # 无名指
-                0.0, 0.0, 0.0   # 小指
+                # Other fingers
+                0.0, 0.0, 0.0,  # Index
+                0.0, 0.0, 0.0,  # Middle
+                0.0, 0.0, 0.0,  # Ring
+                0.0, 0.0, 0.0   # Little
             ]
             
-            # 左手：食指弯曲（弧度制）
+            # Left hand: index flex (radians)
             left_custom = [
-                # 拇指的4个关节
+                # Thumb 4 joints
                 0.0, 0.0, 0.0, 0.0,
-                # 食指
+                # Index
                 0.0, math.radians(45.0), math.radians(60.0),
-                # 其他手指
-                0.0, 0.0, 0.0,  # 中指
-                0.0, 0.0, 0.0,  # 无名指
-                0.0, 0.0, 0.0   # 小指
+                # Other fingers
+                0.0, 0.0, 0.0,  # Middle
+                0.0, 0.0, 0.0,  # Ring
+                0.0, 0.0, 0.0   # Little
             ]
             
             custom_double_positions_32 = right_custom + left_custom
-            print(f"设置自定义双手32关节位置: 右手拇指弯曲，左手食指弯曲")
+            print(f"Setting custom dual-hand 32-joint positions: right thumb flex, left index flex")
             success = hand.move_joints_pos(custom_double_positions_32, speed=0.5, use_broadcast=True)
-            print(f"自定义双手位置结果: {'成功' if success else '失败'}")
+            print(f"Custom dual-hand position result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
-            # 测试双手模式 - 张开手势
-            print("\n--- 测试双手张开手势（32关节） ---")
+            # Test dual-hand open gesture
+            print("\n--- Test dual-hand open gesture (32 joints) ---")
             double_open_32 = [0.0] * 32
-            print("执行双手张开手势...")
+            print("Executing dual-hand open gesture...")
             success = hand.move_joints_pos(double_open_32, speed=0.5, use_broadcast=True)
-            print(f"双手张开结果: {'成功' if success else '失败'}")
+            print(f"Dual-hand open result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
         else:
-            print(f"GaiaHand20 双手模式连接失败 (左手: {ports_config['left']}, 右手: {ports_config['right']})")
+            print(f"GaiaHand20 dual-hand connection failed (left: {ports_config['left']}, right: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand20 双手模式测试失败: {e}")
+        print(f"GaiaHand20 dual-hand test failed: {e}")
         import traceback
         traceback.print_exc()
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
 
 
-def test_gaia20_hand_double_get_joint_positions(ports_config):
+def test_gaiahand20_double_get_joint_positions(ports_config):
     """
-    测试 GaiaHand20 双手模式的 get_joint_positions 功能（32关节）
+    Test GaiaHand20 dual-hand get_joint_positions (32 joints)
     
-    ⭐ 推荐使用：Gaia20当前主要维护版本
+    ⭐ Recommended: GaiaHand20 is the currently maintained version
     
-    波特率配置：230400（不带主控板版本）
+    Baud rate: 230400 (without main board)
     """
-    print("\n=== 测试 GaiaHand20 双手模式 get_joint_positions 功能（32关节）===")
+    print("\n=== Test GaiaHand20 dual-hand get_joint_positions (32 joints) ===")
     
     if not ports_config or not ports_config['left'] or not ports_config['right']:
-        print("未找到可用的左右手串口，跳过双手获取位置测试")
+        print("No available left/right serial ports; skipping dual-hand get-position test")
         return
     
     hand = None
     try:
-        # 创建双手 GaiaHand20 实例
-        # ⭐ 波特率配置：230400（不带主控板版本，默认配置）
-        # 如果使用带主控板版本，需要在create_hand中添加baudrate=921600参数
-        hand = create_hand("gaia20", "double", left_port=ports_config['left'], right_port=ports_config['right'])
+        # Create dual-hand GaiaHand20 instance
+        # ⭐ Baud rate: 230400 (without main board, default)
+        # For main-board hardware, pass baudrate=921600 to create_hand
+        hand = create_hand("gaiahand20", "double", left_port=ports_config['left'], right_port=ports_config['right'])
         
         if hand.connect():
-            print(f"GaiaHand20 双手模式连接成功 (左手: {ports_config['left']}, 右手: {ports_config['right']})")
+            print(f"GaiaHand20 dual-hand connected (left: {ports_config['left']}, right: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 平滑等级范围：0-5，数值越大平滑效果越好
-            set_motor_smooth_level(hand, device_id=255, level=3, description="连接后初始化")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Smoothing range 0-5; higher is smoother
+            set_motor_smooth_level(hand, device_id=255, level=3, description="post-connect init")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(1)
             
-            # 测试1：获取双手所有关节位置（异步模式）
-            print("\n--- 测试1：获取双手所有关节位置（异步模式） ---")
+            # Test 1: get all dual-hand joint positions (async)
+            print("\n--- Test 1: get all dual-hand joint positions (async) ---")
             all_positions = hand.get_joint_positions(sync=False)
-            print(f"双手所有关节位置（异步）: {all_positions}")
-            print(f"位置数据类型: {type(all_positions)}")
+            print(f"All dual-hand joint positions (async): {all_positions}")
+            print(f"Position data type: {type(all_positions)}")
             if isinstance(all_positions, dict):
-                print(f"手部数量: {len(all_positions)}")
+                print(f"Hand count: {len(all_positions)}")
                 for hand_name, positions in all_positions.items():
-                    print(f"  {hand_name}手位置: {positions}")
+                    print(f"  {hand_name} hand positions: {positions}")
                     if isinstance(positions, (list, tuple)):
-                        print(f"  {hand_name}手位置数量: {len(positions)}")
+                        print(f"  {hand_name} hand position count: {len(positions)}")
             time.sleep(0.5)
             
-            # 测试2：获取双手所有关节位置（同步模式）
-            print("\n--- 测试2：获取双手所有关节位置（同步模式） ---")
+            # Test 2: get all dual-hand joint positions (sync)
+            print("\n--- Test 2: get all dual-hand joint positions (sync) ---")
             all_positions_sync = hand.get_joint_positions(sync=True, timeout=0.1)
-            print(f"双手所有关节位置（同步）: {all_positions_sync}")
-            print(f"位置数据类型: {type(all_positions_sync)}")
+            print(f"All dual-hand joint positions (sync): {all_positions_sync}")
+            print(f"Position data type: {type(all_positions_sync)}")
             if isinstance(all_positions_sync, dict):
                 for hand_name, positions in all_positions_sync.items():
-                    print(f"  {hand_name}手位置: {positions}")
+                    print(f"  {hand_name} hand positions: {positions}")
                     if isinstance(positions, (list, tuple)) and len(positions) >= 16:
-                        # 转换为度数显示
+                        # Convert to degrees for display
                         degrees = [math.degrees(p) if p is not None else None for p in positions[:5]]
-                        print(f"  {hand_name}手前5个关节位置（度）: {degrees}")
+                        print(f"  {hand_name} hand first 5 joint positions (deg): {degrees}")
             time.sleep(0.5)
             
-            # 测试3：设置双手位置后获取位置验证
-            print("\n--- 测试3：设置双手位置后获取位置验证 ---")
-            # 设置右手位置
+            # Test 3: verify dual-hand positions after set
+            print("\n--- Test 3: verify dual-hand positions after set ---")
+            # Set right-hand positions
             right_positions = [
-                # 拇指的4个关节
+                # Thumb 4 joints
                 0.0, math.radians(10.0), math.radians(20.0), math.radians(15.0),
-                # 其他手指
-                0.0, math.radians(30.0), math.radians(40.0),  # 食指
-                0.0, math.radians(25.0), math.radians(35.0),  # 中指
-                0.0, math.radians(20.0), math.radians(30.0),  # 无名指
-                0.0, math.radians(15.0), math.radians(25.0)   # 小指
+                # Other fingers
+                0.0, math.radians(30.0), math.radians(40.0),  # Index
+                0.0, math.radians(25.0), math.radians(35.0),  # Middle
+                0.0, math.radians(20.0), math.radians(30.0),  # Ring
+                0.0, math.radians(15.0), math.radians(25.0)   # Little
             ]
-            # 设置左手位置
+            # Set left-hand positions
             left_positions = [
-                # 拇指的4个关节
+                # Thumb 4 joints
                 0.0, math.radians(5.0), math.radians(15.0), math.radians(10.0),
-                # 其他手指
-                0.0, math.radians(25.0), math.radians(35.0),  # 食指
-                0.0, math.radians(20.0), math.radians(30.0),  # 中指
-                0.0, math.radians(15.0), math.radians(25.0),  # 无名指
-                0.0, math.radians(10.0), math.radians(20.0)   # 小指
+                # Other fingers
+                0.0, math.radians(25.0), math.radians(35.0),  # Index
+                0.0, math.radians(20.0), math.radians(30.0),  # Middle
+                0.0, math.radians(15.0), math.radians(25.0),  # Ring
+                0.0, math.radians(10.0), math.radians(20.0)   # Little
             ]
             
             double_positions = right_positions + left_positions
-            print(f"设置双手目标位置（右手前5个关节，弧度）: {right_positions[:5]}")
-            print(f"设置双手目标位置（左手前5个关节，弧度）: {left_positions[:5]}")
+            print(f"Target dual-hand positions (right first 5 joints, rad): {right_positions[:5]}")
+            print(f"Target dual-hand positions (left first 5 joints, rad): {left_positions[:5]}")
             success = hand.move_joints_pos(double_positions, speed=0.8, use_broadcast=True)
-            print(f"设置双手位置结果: {'成功' if success else '失败'}")
+            print(f"Dual-hand set position result: {'succeeded' if success else 'failed'}")
             
-            # 等待运动完成
+            # Wait for motion to finish
             time.sleep(2)
             
-            # 获取当前位置
+            # Read current positions
             current_positions = hand.get_joint_positions(sync=True, timeout=0.1)
-            print(f"当前位置: {current_positions}")
+            print(f"Current positions: {current_positions}")
             if isinstance(current_positions, dict):
                 if 'right' in current_positions:
                     right_current = current_positions['right']
                     if isinstance(right_current, (list, tuple)) and len(right_current) >= 5:
-                        print("右手位置对比（前5个关节）:")
+                        print("Right-hand position comparison (first 5 joints):")
                         for i in range(5):
                             target = right_positions[i] if i < len(right_positions) else None
                             current = right_current[i] if i < len(right_current) else None
                             if target is not None and current is not None:
                                 diff = abs(target - current)
-                                print(f"  关节{i+1}: 目标={math.degrees(target):.2f}°, 当前={math.degrees(current):.2f}°, 误差={math.degrees(diff):.2f}°")
+                                print(f"  Joint {i+1}: target={math.degrees(target):.2f}°, current={math.degrees(current):.2f}°, error={math.degrees(diff):.2f}°")
                 
                 if 'left' in current_positions:
                     left_current = current_positions['left']
                     if isinstance(left_current, (list, tuple)) and len(left_current) >= 5:
-                        print("左手位置对比（前5个关节）:")
+                        print("Left-hand position comparison (first 5 joints):")
                         for i in range(5):
                             target = left_positions[i] if i < len(left_positions) else None
                             current = left_current[i] if i < len(left_current) else None
                             if target is not None and current is not None:
                                 diff = abs(target - current)
-                                print(f"  关节{i+1}: 目标={math.degrees(target):.2f}°, 当前={math.degrees(current):.2f}°, 误差={math.degrees(diff):.2f}°")
+                                print(f"  Joint {i+1}: target={math.degrees(target):.2f}°, current={math.degrees(current):.2f}°, error={math.degrees(diff):.2f}°")
             time.sleep(1)
             
-            # 测试4：多次获取双手位置（观察数据变化）
-            print("\n--- 测试4：多次获取双手位置（观察数据变化） ---")
+            # Test 4: repeated dual-hand position reads
+            print("\n--- Test 4: repeated dual-hand position reads ---")
             for i in range(3):
                 positions = hand.get_joint_positions(sync=True, timeout=0.1)
                 if isinstance(positions, dict):
@@ -1758,413 +1758,413 @@ def test_gaia20_hand_double_get_joint_positions(ports_config):
                         right_pos = positions['right']
                         if isinstance(right_pos, (list, tuple)) and len(right_pos) >= 4:
                             thumb_degrees = [math.degrees(p) if p is not None else None for p in right_pos[:4]]
-                            print(f"第{i+1}次获取 - 右手拇指关节位置（度）: {thumb_degrees}")
+                            print(f"Read {i+1} - right thumb joint positions (deg): {thumb_degrees}")
                     if 'left' in positions:
                         left_pos = positions['left']
                         if isinstance(left_pos, (list, tuple)) and len(left_pos) >= 4:
                             thumb_degrees = [math.degrees(p) if p is not None else None for p in left_pos[:4]]
-                            print(f"第{i+1}次获取 - 左手拇指关节位置（度）: {thumb_degrees}")
+                            print(f"Read {i+1} - left thumb joint positions (deg): {thumb_degrees}")
                 time.sleep(0.5)
             
-            # 回零
-            print("\n执行双手回零操作...")
+            # Homing
+            print("\nExecuting dual-hand homing...")
             success = hand.hand_zero()
-            print(f"回零结果: {'成功' if success else '失败'}")
+            print(f"Homing result: {'succeeded' if success else 'failed'}")
             time.sleep(1)
             
-            # 测试5：回零后获取双手位置
-            print("\n--- 测试5：回零后获取双手位置 ---")
+            # Test 5: get dual-hand positions after homing
+            print("\n--- Test 5: get dual-hand positions after homing ---")
             zero_positions = hand.get_joint_positions(sync=True, timeout=0.1)
-            print(f"回零后位置: {zero_positions}")
+            print(f"Positions after homing: {zero_positions}")
             if isinstance(zero_positions, dict):
                 for hand_name, positions in zero_positions.items():
                     if isinstance(positions, (list, tuple)) and len(positions) >= 16:
                         degrees = [math.degrees(p) if p is not None else None for p in positions]
-                        print(f"{hand_name}手回零后位置（度）: {degrees}")
+                        print(f"{hand_name} hand positions after homing (deg): {degrees}")
             
         else:
-            print(f"GaiaHand20 双手模式连接失败 (左手: {ports_config['left']}, 右手: {ports_config['right']})")
+            print(f"GaiaHand20 dual-hand connection failed (left: {ports_config['left']}, right: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand20 双手模式 get_joint_positions 测试失败: {e}")
+        print(f"GaiaHand20 dual-hand get_joint_positions test failed: {e}")
         import traceback
         traceback.print_exc()
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
 
-def test_gaia20_hand_reset_zero(ports_config):
+def test_gaiahand20_reset_zero(ports_config):
     """
-    测试 GaiaHand20 手部回零功能（16关节版本）
+    Test GaiaHand20 homing (16-joint version)
     
-    ⭐ 推荐使用：Gaia20当前主要维护版本
+    ⭐ Recommended: GaiaHand20 is the currently maintained version
     
-    波特率配置：921600（带主控板版本，高性能配置）
+    Baud rate: 921600 (with main board, high-performance)
     """
-    print("\n=== 测试 GaiaHand20 手部回零功能（16关节版本）===")
+    print("\n=== Test GaiaHand20 hand homing (16-joint version) ===")
     
     if not ports_config or not ports_config['right']:
-        print("未找到可用的右手串口，跳过回零测试")
+        print("No available right-hand serial port; skipping homing test")
         return
     
     hand = None
     try:
-        # 创建右手 GaiaHand20 实例
-        # ⭐ 波特率配置：921600（带主控板版本，高性能配置）
-        # 如果使用不带主控板版本，请修改为：baudrate=230400
-        hand = create_hand("gaia20", "right", port=ports_config['right'], baudrate=921600)
+        # Create right-hand GaiaHand20 instance
+        # ⭐ Baud rate: 921600 (with main board, high-performance)
+        # Without main board, use baudrate=230400
+        hand = create_hand("gaiahand20", "right", port=ports_config['right'], baudrate=921600)
         
         if hand.connect():
-            print(f"GaiaHand20 连接成功，开始回零测试 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 connected, starting homing test (serial port: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 平滑等级范围：0-5，数值越大平滑效果越好
-            set_motor_smooth_level(hand, device_id=255, level=3, description="连接后初始化")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Smoothing range 0-5; higher is smoother
+            set_motor_smooth_level(hand, device_id=255, level=3, description="post-connect init")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(2)
             
-            # 执行回零操作
-            print("执行回零操作...")
+            # Run homing
+            print("Executing homing...")
             hand.hand_zero()
-            print("回零操作完成")
+            print("Homing complete")
             
             time.sleep(2)
             
         else:
-            print(f"GaiaHand20 连接失败 (串口: {ports_config['right']})")
+            print(f"GaiaHand20 connection failed (serial port: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand20 回零测试失败: {e}")
+        print(f"GaiaHand20 homing test failed: {e}")
         import traceback
         traceback.print_exc()
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
-def test_gaia_hand_move_joints_pos(ports_config):
+def test_gaiahand15_move_joints_pos(ports_config):
     """
-    测试 GaiaHand 的 move_joints_pos 功能
+    Test GaiaHand15 move_joints_pos
     
-    ⚠️ 注意：Gaia15已暂停维护，此函数仅用于兼容旧代码
-    推荐使用 test_gaia20_hand_move_joints_pos() 函数
+    ⚠️ GaiaHand15 is no longer maintained; this function is for backward compatibility only
+    Prefer test_gaiahand20_move_joints_pos()
     
-    波特率配置：
-    - 标准配置：230400
-    - 注意：此函数中使用了921600，但标准配置应为230400
+    Baud rate:
+    - Standard: 230400
+    - Note: this function uses 921600, but standard is 230400
     """
-    print("=== 测试 GaiaHand move_joints_pos 功能 ===")
+    print("=== Test GaiaHand15 move_joints_pos ===")
     
     if not ports_config or not ports_config['right']:
-        print("未找到可用的右手串口，跳过单手测试")
+        print("No available right-hand serial port; skipping single-hand test")
         return
     
     hand = None
     try:
-        # 创建右手 GaiaHand 实例
-        # ⚠️ 注意：Gaia15标准配置应为230400，此处使用921600仅用于示例
-        # 建议修改为：baudrate=230400
-        hand = create_hand("gaia", "right", port=ports_config['right'], baudrate=921600)
+        # Create right-hand GaiaHand15 instance
+        # ⚠️ GaiaHand15 standard is 230400; 921600 here is example-only
+        # Recommended: baudrate=230400
+        hand = create_hand("gaiahand15", "right", port=ports_config['right'], baudrate=921600)
 
         if hand.connect():
-            print(f"GaiaHand 连接成功 (串口: {ports_config['right']})")
+            print(f"GaiaHand15 Connected (serial port: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 平滑等级范围：0-5，数值越大平滑效果越好
-            set_motor_smooth_level(hand, device_id=255, level=3, description="连接后初始化")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Smoothing range 0-5; higher is smoother
+            set_motor_smooth_level(hand, device_id=255, level=3, description="post-connect init")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(2)
             
-            # 测试单手模式 - 15个关节位置（非广播模式，默认）
-            print("\n--- 测试单手模式（非广播） ---")
+            # Test single-hand mode — 15 joints (non-broadcast, default)
+            print("\n--- Test single-hand mode (non-broadcast) ---")
             
-            # 测试单手模式 - 自定义位置数据
-            print("\n--- 测试单手模式（自定义位置） ---")
+            # Test single-hand mode — custom positions
+            print("\n--- Test single-hand mode (custom positions) ---")
             
-            # 创建自定义位置数据：每个手指不同的角度（弧度制）
+            # Custom positions: different angle per finger (radians)
             custom_positions = [
-                # 拇指的3个关节
+                # Thumb 3 joints
                 0.0, math.radians(27.0), math.radians(43.0),
-                # 食指的3个关节
+                # Index 3 joints
                 0.0, math.radians(43.0), math.radians(56.0),
-                # 中指的3个关节
+                # Middle 3 joints
                 0.0, math.radians(33.0), math.radians(25.0),
-                # 无名指的3个关节
+                # Ring 3 joints
                 0.0, math.radians(28.0), math.radians(18.0),
-                # 小指的3个关节
+                # Little 3 joints
                 0.0, math.radians(19.0), math.radians(26.0)
             ]
             
-            print(f"设置自定义位置数据: {custom_positions}")
+            print(f"Setting custom position data: {custom_positions}")
             success = hand.move_joints_pos(custom_positions, speed=1, use_broadcast=True)
-            print(f"自定义位置结果: {'成功' if success else '失败'}")
+            print(f"Custom position result: {'succeeded' if success else 'failed'}")
             
-            # 等待2秒
+            # Wait 2 seconds
             time.sleep(2)
             
-            # 测试单手模式 - 手势执行
-            print("\n--- 测试单手模式（手势执行） ---")
+            # Test single-hand mode — gesture execution
+            print("\n--- Test single-hand mode (gesture execution) ---")
             
-            # 张开手势（所有关节伸直）
+            # Open-hand gesture (all joints extended)
             open_positions = [0.0] * 15
-            print("执行张开手势...")
+            print("Executing open-hand gesture...")
             success = hand.move_joints_pos(open_positions, speed=1, use_broadcast=True)
-            print(f"张开结果: {'成功' if success else '失败'}")
+            print(f"Open-hand result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
         else:
-            print(f"GaiaHand 连接失败 (串口: {ports_config['right']})")
+            print(f"GaiaHand15 connection failed (serial port: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand 测试失败: {e}")
+        print(f"GaiaHand15 test failed: {e}")
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
-def test_gaia_hand_double_move_joints_pos(ports_config):
+def test_gaiahand15_double_move_joints_pos(ports_config):
     """
-    测试 GaiaHand 双手模式的 move_joints_pos 功能
+    Test GaiaHand15 dual-hand move_joints_pos
     
-    ⚠️ 注意：Gaia15已暂停维护，此函数仅用于兼容旧代码
-    推荐使用 test_gaia20_hand_double_move_joints_pos() 函数
+    ⚠️ GaiaHand15 is no longer maintained; this function is for backward compatibility only
+    Prefer test_gaiahand20_double_move_joints_pos()
     
-    波特率配置：230400（标准配置）
+    Baud rate: 230400 (standard configuration)
     """
-    print("\n=== 测试 GaiaHand 双手模式 move_joints_pos 功能 ===")
+    print("\n=== Test GaiaHand15 dual-hand move_joints_pos ===")
     
     if not ports_config or not ports_config['left'] or not ports_config['right']:
-        print("未找到可用的左右手串口，跳过双手测试")
+        print("No available left/right serial ports; skipping dual-hand test")
         return
     
     hand = None
     try:
-        # 创建双手 GaiaHand 实例
-        # ⚠️ 注意：Gaia15已暂停维护，此函数仅用于兼容旧代码
-        # 波特率配置：230400（标准配置）
-        hand = create_hand("gaia", "double", left_port=ports_config['left'], right_port=ports_config['right'])
+        # Create dual-hand GaiaHand15 instance
+        # ⚠️ GaiaHand15 is no longer maintained; this function is for backward compatibility only
+        # Baud rate: 230400 (standard configuration)
+        hand = create_hand("gaiahand15", "double", left_port=ports_config['left'], right_port=ports_config['right'])
         
         if hand.connect():
-            print(f"GaiaHand 双手模式连接成功 (左手: {ports_config['left']}, 右手: {ports_config['right']})")
+            print(f"GaiaHand15 dual-hand connected (left: {ports_config['left']}, right: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 平滑等级范围：0-5，数值越大平滑效果越好
-            set_motor_smooth_level(hand, device_id=255, level=3, description="连接后初始化")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Smoothing range 0-5; higher is smoother
+            set_motor_smooth_level(hand, device_id=255, level=3, description="post-connect init")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(1)
             
-            # 测试双手模式 - 30个关节位置
-            print("\n--- 测试双手模式（非广播） ---")
+            # Test dual-hand mode — 30 joints
+            print("\n--- Test dual-hand mode (non-broadcast) ---")
             
-            # 创建双手测试位置数据
-            # 修改顺序：前15个是右手，后15个是左手
-            right_positions = [math.radians(5.0)] * 15  # 右手所有关节5度（弧度制）
-            left_positions = [math.radians(-5.0)] * 15   # 左手所有关节-5度（弧度制）
+            # Build dual-hand test positions
+            # Order: first 15 = right hand, last 15 = left hand
+            right_positions = [math.radians(5.0)] * 15  # Right hand all joints 5 deg (radians)
+            left_positions = [math.radians(-5.0)] * 15   # Left hand all joints -5 deg (radians)
             double_positions = right_positions + left_positions
             
-            print(f"设置双手位置数据: 右手{right_positions[:3]}..., 左手{left_positions[:3]}...")
+            print(f"Setting dual-hand position data: right{right_positions[:3]}..., left{left_positions[:3]}...")
             
-            # 使用非广播模式
+            # Use non-broadcast mode
             success = hand.move_joints_pos(double_positions, speed=0.5, use_broadcast=False)
-            print(f"双手非广播模式结果: {'成功' if success else '失败'}")
+            print(f"Dual-hand non-broadcast result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
-            # 使用广播模式
-            print("\n--- 测试双手模式（广播模式） ---")
+            # Use broadcast mode
+            print("\n--- Test dual-hand mode (broadcast) ---")
             success = hand.move_joints_pos(double_positions, speed=0.5, use_broadcast=True)
-            print(f"双手广播模式结果: {'成功' if success else '失败'}")
+            print(f"Dual-hand broadcast result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
-            # 测试双手模式 - 自定义位置数据
-            print("\n--- 测试双手模式（自定义位置） ---")
+            # Test dual-hand mode — custom positions
+            print("\n--- Test dual-hand mode (custom positions) ---")
             
-            # 右手：拇指弯曲，其他手指伸直（弧度制）
+            # Right hand: thumb flex, other fingers extended (radians)
             right_custom = [
-                # 拇指的3个关节
+                # Thumb 3 joints
                 0.0, math.radians(45.0), math.radians(45.0),
-                # 其他手指的3个关节
-                0.0, 0.0, 0.0,  # 食指
-                0.0, 0.0, 0.0,  # 中指
-                0.0, 0.0, 0.0,  # 无名指
-                0.0, 0.0, 0.0   # 小指
+                # Other fingers 3 joints each
+                0.0, 0.0, 0.0,  # Index
+                0.0, 0.0, 0.0,  # Middle
+                0.0, 0.0, 0.0,  # Ring
+                0.0, 0.0, 0.0   # Little
             ]
             
-            # 左手：食指弯曲，其他手指伸直（弧度制）
+            # Left hand: index flex, other fingers extended (radians)
             left_custom = [
-                # 拇指的3个关节
+                # Thumb 3 joints
                 0.0, 0.0, 0.0,
-                # 食指的3个关节
+                # Index 3 joints
                 0.0, math.radians(45.0), math.radians(45.0),
-                # 其他手指的3个关节
-                0.0, 0.0, 0.0,  # 中指
-                0.0, 0.0, 0.0,  # 无名指
-                0.0, 0.0, 0.0   # 小指
+                # Other fingers 3 joints each
+                0.0, 0.0, 0.0,  # Middle
+                0.0, 0.0, 0.0,  # Ring
+                0.0, 0.0, 0.0   # Little
             ]
             
             custom_double_positions = right_custom + left_custom
-            print(f"设置自定义双手位置数据: 右手拇指弯曲，左手食指弯曲")
+            print(f"Setting custom dual-hand positions: right thumb flex, left index flex")
             success = hand.move_joints_pos(custom_double_positions, speed=0.5, use_broadcast=False)
-            print(f"自定义双手位置结果: {'成功' if success else '失败'}")
+            print(f"Custom dual-hand position result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
-            # 测试双手模式 - 手势执行
-            print("\n--- 测试双手模式（手势执行） ---")
+            # Test dual-hand mode — gesture execution
+            print("\n--- Test dual-hand mode (gesture execution) ---")
             
-            # 双手运动（弧度制）
+            # Dual-hand motion (radians)
             double_fist = [math.radians(10.0)] * 30
-            print("执行双手握拳手势...")
+            print("Executing dual-hand fist gesture...")
             success = hand.move_joints_pos(double_fist, speed=0.5, use_broadcast=False)
-            print(f"双手握拳结果: {'成功' if success else '失败'}")
+            print(f"Dual-hand fist result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
-            # 双手回零
+            # Dual-hand homing
             double_open = [0.0] * 30
-            print("执行双手张开手势...")
+            print("Executing dual-hand open gesture...")
             success = hand.move_joints_pos(double_open, speed=0.5, use_broadcast=True)
-            print(f"双手张开结果: {'成功' if success else '失败'}")
+            print(f"Dual-hand open result: {'succeeded' if success else 'failed'}")
             
             time.sleep(2)
             
         else:
-            print(f"GaiaHand 双手模式连接失败 (左手: {ports_config['left']}, 右手: {ports_config['right']})")
+            print(f"GaiaHand15 dual-hand connection failed (left: {ports_config['left']}, right: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand 双手模式测试失败: {e}")
+        print(f"GaiaHand15 dual-hand test failed: {e}")
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
-def test_gaia_hand_smooth_transition(ports_config):
+def test_gaiahand15_smooth_transition(ports_config):
     """
-    测试 GaiaHand 平滑过渡功能
+    Test GaiaHand15 smooth transition
     
-    ⚠️ 注意：Gaia15已暂停维护，此函数仅用于兼容旧代码
-    推荐使用 test_gaia20_hand_smooth_transition() 函数
+    ⚠️ GaiaHand15 is no longer maintained; this function is for backward compatibility only
+    Prefer test_gaiahand20_smooth_transition()
     
-    波特率配置：
-    - 标准配置：230400
-    - 注意：此函数中使用了921600，但标准配置应为230400
+    Baud rate:
+    - Standard: 230400
+    - Note: this function uses 921600, but standard is 230400
     """
-    print("\n=== 测试 GaiaHand 平滑过渡功能 ===")
+    print("\n=== Test GaiaHand15 smooth transition ===")
     
     if not ports_config or not ports_config['right']:
-        print("未找到可用的右手串口，跳过平滑过渡测试")
+        print("No available right-hand serial port; skipping smooth transition test")
         return
     
     hand = None
     try:
-        # 创建右手 GaiaHand 实例
-        # ⚠️ 注意：Gaia15标准配置应为230400，此处使用921600仅用于示例
-        # 建议修改为：baudrate=230400
-        hand = create_hand("gaia", "right", port=ports_config['right'], baudrate=921600)
+        # Create right-hand GaiaHand15 instance
+        # ⚠️ GaiaHand15 standard is 230400; 921600 here is example-only
+        # Recommended: baudrate=230400
+        hand = create_hand("gaiahand15", "right", port=ports_config['right'], baudrate=921600)
         
         if hand.connect():
-            print(f"GaiaHand 连接成功，开始平滑过渡测试 (串口: {ports_config['right']})")
+            print(f"GaiaHand15 connected, starting smooth transition test (serial port: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 平滑等级范围：0-5，数值越大平滑效果越好
-            set_motor_smooth_level(hand, device_id=255, level=3, description="连接后初始化")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Smoothing range 0-5; higher is smoother
+            set_motor_smooth_level(hand, device_id=255, level=3, description="post-connect init")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(1)
             
-            # 创建起始和结束位置（弧度制）
+            # Define start and end positions (radians)
             start_positions = [0.0] * 15
             end_positions = [
-                # 拇指的3个关节
+                # Thumb 3 joints
                 0.0, math.radians(27.0), math.radians(43.0),
-                # 食指的3个关节
+                # Index 3 joints
                 0.0, math.radians(43.0), math.radians(56.0),
-                # 中指的3个关节
+                # Middle 3 joints
                 0.0, math.radians(33.0), math.radians(25.0),
-                # 无名指的3个关节
+                # Ring 3 joints
                 0.0, math.radians(28.0), math.radians(18.0),
-                # 小指的3个关节
+                # Little 3 joints
                 0.0, math.radians(19.0), math.radians(26.0)
             ]
             
-            print("执行平滑过渡：从伸直状态到弯曲状态")
+            print("Running smooth transition: extended to flexed")
             
-            # 分5步过渡（非广播模式，更稳定）
+            # Transition in 5 steps (non-broadcast, more stable)
             for i in range(6):
                 t = i / 5.0
                 positions = []
@@ -2172,18 +2172,18 @@ def test_gaia_hand_smooth_transition(ports_config):
                     pos = start_positions[j] + (end_positions[j] - start_positions[j]) * t
                     positions.append(pos)
                 
-                print(f"步骤 {i+1}/6: 过渡进度 {t*100:.1f}%")
+                print(f"Step {i+1}/6: transition progress {t*100:.1f}%")
                 hand.move_joints_pos(positions, speed=0.5, use_broadcast=True)
                 time.sleep(0.05)
                 current_positions = hand.get_joint_positions()
-                print(f"当前关节位置=====================: {current_positions}")
+                print(f"Current joint positions=====================: {current_positions}")
 
-            print("平滑过渡完成")
+            print("Smooth transition complete")
             
             time.sleep(2)
             
-            # 反向过渡：从弯曲状态到伸直状态
-            print("执行反向过渡：从弯曲状态到伸直状态")
+            # Reverse transition: flexed to extended
+            print("Running reverse transition: flexed to extended")
             
             for i in range(10):
                 t = i / 10.0
@@ -2192,206 +2192,206 @@ def test_gaia_hand_smooth_transition(ports_config):
                     pos = end_positions[j] + (start_positions[j] - end_positions[j]) * t
                     positions.append(pos)
                 
-                print(f"步骤 {i+1}/6: 过渡进度 {t*100:.1f}%")
+                print(f"Step {i+1}/6: transition progress {t*100:.1f}%")
                 hand.move_joints_pos(positions, speed=0.5, use_broadcast=True)
                 time.sleep(0.05)
                 current_positions = hand.get_joint_positions()
-                print(f"当前关节位置======================: {current_positions}")
+                print(f"Current joint positions======================: {current_positions}")
             
-            print("反向过渡完成")
+            print("Reverse transition complete")
 
             time.sleep(2)
             
         else:
-            print(f"GaiaHand 连接失败 (串口: {ports_config['right']})")
+            print(f"GaiaHand15 connection failed (serial port: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand 平滑过渡测试失败: {e}")
+        print(f"GaiaHand15 smooth transition test failed: {e}")
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
 def test_reset_pose_zero(ports_config):
     """
-    测试手部回零功能（Gaia15）
+    Test hand homing (GaiaHand15)
     
-    ⚠️ 注意：Gaia15已暂停维护，此函数仅用于兼容旧代码
-    推荐使用 test_gaia20_hand_reset_zero() 函数
+    ⚠️ GaiaHand15 is no longer maintained; this function is for backward compatibility only
+    Prefer test_gaiahand20_reset_zero()
     
-    波特率配置：230400（标准配置）
+    Baud rate: 230400 (standard configuration)
     """
-    print("\n=== 测试手部回零功能 ===")
+    print("\n=== Test hand homing ===")
     
     if not ports_config or not ports_config['right']:
-        print("未找到可用的右手串口，跳过回零测试")
+        print("No available right-hand serial port; skipping homing test")
         return
     
     hand = None
     try:
-        # 创建右手 GaiaHand 实例
-        hand = create_hand("gaia", "right", port=ports_config['right'])
+        # Create right-hand GaiaHand15 instance
+        hand = create_hand("gaiahand15", "right", port=ports_config['right'])
         
         if hand.connect():
-            print(f"GaiaHand 连接成功，开始回零测试 (串口: {ports_config['right']})")
+            print(f"GaiaHand15 connected, starting homing test (serial port: {ports_config['right']})")
             
-            # 设置电机平滑等级（device_id=255表示广播所有电机，level=3）
-            # 平滑等级范围：0-5，数值越大平滑效果越好
-            set_motor_smooth_level(hand, device_id=255, level=3, description="连接后初始化")
+            # Set motor smoothing (device_id=255 broadcasts to all motors, level=3)
+            # Smoothing range 0-5; higher is smoother
+            set_motor_smooth_level(hand, device_id=255, level=3, description="post-connect init")
             
-            # 等待设置生效
+            # Wait for settings to take effect
             time.sleep(0.5)
             
-            # 上使能所有关节
-            print("上使能所有关节...")
+            # Enable all joints
+            print("Enabling all joints...")
             enable_success = hand.enable_all_motors_broadcast(True)
-            print(f"上使能结果: {'成功' if enable_success else '失败'}")
+            print(f"Enable result: {'succeeded' if enable_success else 'failed'}")
             
             if not enable_success:
-                print("上使能失败，无法继续测试")
+                print("Enable failed; cannot continue test")
                 return
             
-            # 等待使能稳定
+            # Wait for enable to stabilize
             time.sleep(2)
             
-            # 执行回零操作
-            print("执行回零操作...")
+            # Run homing
+            print("Executing homing...")
             hand.hand_zero()
-            print("回零操作完成")
+            print("Homing complete")
             
             time.sleep(2)
             
         else:
-            print(f"GaiaHand 连接失败 (串口: {ports_config['right']})")
+            print(f"GaiaHand15 connection failed (serial port: {ports_config['right']})")
             
     except Exception as e:
-        print(f"GaiaHand 回零测试失败: {e}")
+        print(f"GaiaHand15 homing test failed: {e}")
     finally:
         if hand and hand.is_connected():
-            print("回零...")
+            print("Homing...")
             hand.hand_zero()
             time.sleep(1)
-            print("下使能所有关节...")
+            print("Disabling all joints...")
             disable_success = hand.enable_all_motors_broadcast(False)
-            print(f"下使能结果: {'成功' if disable_success else '失败'}")
+            print(f"Disable result: {'succeeded' if disable_success else 'failed'}")
             hand.close()
 
 
 def main():
     """
-    主测试函数
+    Main test entry
     
-    ⭐ 推荐使用 Gaia20（16关节版本），当前主要维护版本
-    ⚠️ Gaia15（15关节版本）已暂停维护，相关测试函数仅用于兼容旧代码
+    ⭐ Recommended: GaiaHand20 (16-joint version), currently the main maintained release
+    ⚠️ GaiaHand15 (15-joint) is no longer maintained; related tests kept for compatibility
     
-    波特率配置说明：
-    - Gaia15: 230400（标准配置）
-    - Gaia20不带主控板: 230400（默认配置）
-    - Gaia20带主控板: 921600（高性能配置）
+    Baud rate configuration:
+    - GaiaHand15: 230400 (standard configuration)
+    - GaiaHand20 without main board: 230400 (default configuration)
+    - GaiaHand20 with main board: 921600 (high-performance configuration)
     
-    使用说明：
-    1. 根据您的硬件配置选择合适的测试函数
-    2. 取消注释相应的测试函数来运行测试
-    3. 默认优先运行Gaia20测试函数
+    Usage:
+    1. Pick test functions matching your hardware
+    2. Uncomment the desired test functions to run tests
+    3. GaiaHand20 tests are preferred by default
     """
-    print("开始测试 GaiaHand 功能")
+    print("Starting GaiaHand tests")
     print("=" * 50)
-    print("⭐ 推荐使用 Gaia20（16关节版本），当前主要维护版本")
-    print("⚠️ Gaia15（15关节版本）已暂停维护")
+    print("Recommended: GaiaHand20 (16-joint version), currently maintained")
+    print("GaiaHand15 (15-joint version) is no longer maintained")
     print("=" * 50)
 
-    # 设置日志等级（可选：取消注释 test_log_management() 测试日志管理功能）
+    # Set log level (optional: uncomment test_log_management() to exercise log management)
     # test_log_management()
     set_log_level('INFO') # DEBUG INFO WARNING ERROR CRITICAL
     # enable_all_logs()
     # disable_all_logs()
     # set_both_output()
 
-    # 检测串口
+    # Detect serial ports
     ports_config = detect_serial_ports()
     
     if not ports_config:
-        print("串口检测失败，无法进行测试")
+        print("Serial port detection failed; cannot run tests")
         return
     
-    print(f"\n使用串口配置:")
-    print(f"  左手: {ports_config['left']}")
-    print(f"  右手: {ports_config['right']}")
-    print(f"  可用串口: {ports_config['available']}")
+    print(f"\nUsing serial port config:")
+    print(f"  Left: {ports_config['left']}")
+    print(f"  Right: {ports_config['right']}")
+    print(f"  Available ports: {ports_config['available']}")
     
-    print("\n波特率配置说明：")
-    print("  - Gaia15: 230400（标准配置）")
-    print("  - Gaia20不带主控板: 230400（默认配置）")
-    print("  - Gaia20带主控板: 921600（高性能配置）")
+    print("\nBaudrate notes:")
+    print("  - GaiaHand15: 230400 (standard)")
+    print("  - GaiaHand20 without main board: 230400 (default)")
+    print("  - GaiaHand20 with main board: 921600 (high-performance)")
 
-    # ==================== GaiaHand20（16关节）测试 ⭐ 推荐使用 ====================
+    # ==================== GaiaHand20 (16-joint) tests ⭐ recommended ====================
     print("\n" + "=" * 50)
-    print("GaiaHand20（16关节）测试 ⭐ 推荐使用")
+    print("GaiaHand20 (16-joint) tests - recommended")
     print("=" * 50)
 
-    # 测试 GaiaHand20 创建手部实例
-    # test_gaia20_hand_create_hand(ports_config)
+    # Test GaiaHand20 instance creation
+    # test_gaiahand20_create_hand(ports_config)
     
-    # 测试 GaiaHand20 状态获取（连接状态、关节位置、电机状态）
-    # test_gaia20_hand_get_status(ports_config)
+    # Test GaiaHand20 status (connection, joint positions, motor status)
+    # test_gaiahand20_get_status(ports_config)
 
-    # 测试 GaiaHand20 关节限位接口（默认不连接硬件、不发送运动指令）
-    # test_gaia20_hand_joint_limits(ports_config)
-    # 如需连接硬件验证超限夹紧，可使用：
-    # test_gaia20_hand_joint_limits(ports_config, connect_for_motion=True)
+    # Test GaiaHand20 joint limits (no hardware connection or motion by default)
+    # test_gaiahand20_joint_limits(ports_config)
+    # To verify limit clamping on hardware, use:
+    # test_gaiahand20_joint_limits(ports_config, connect_for_motion=True)
     
-    # 测试 GaiaHand20 单手模式获取位置（默认启用）
-    # test_gaia20_hand_get_joint_positions(ports_config)
+    # Test GaiaHand20 single-hand get_joint_positions (enabled by default)
+    # test_gaiahand20_get_joint_positions(ports_config)
 
-    # 测试 GaiaHand20 单手模式 get_joints_pos_vel（协议字典 3=位置 5=速度；可与上项对照连接配置）
-    test_gaia20_hand_get_joints_pos_vel(ports_config)
+    # Test GaiaHand20 get_joints_pos_vel (protocol keys 3=position 5=velocity; same connection options as above)
+    test_gaiahand20_get_joints_pos_vel(ports_config)
     
-    # 测试 GaiaHand20 单手模式（列表格式）- 波特率：230400（不带主控板）
-    # test_gaia20_hand_move_joints_pos_list(ports_config)
+    # Test GaiaHand20 single-hand list format — baud 230400 (no main board)
+    # test_gaiahand20_move_joints_pos_list(ports_config)
     
-    # 测试 GaiaHand20 单手模式（字典格式）- 波特率：230400（不带主控板）
-    # test_gaia20_hand_move_joints_pos_dict(ports_config)
+    # Test GaiaHand20 single-hand dict format — baud 230400 (no main board)
+    # test_gaiahand20_move_joints_pos_dict(ports_config)
     
-    # 测试 GaiaHand20 双手模式（列表格式）- 波特率：230400（不带主控板）
-    # test_gaia20_hand_double_move_joints_pos(ports_config)
+    # Test GaiaHand20 dual-hand list format — baud 230400 (no main board)
+    # test_gaiahand20_double_move_joints_pos(ports_config)
     
-    # 测试 GaiaHand20 双手模式（字典格式）- 波特率：230400（不带主控板）
-    # test_gaia20_hand_double_move_joints_pos_dict(ports_config)
+    # Test GaiaHand20 dual-hand dict format — baud 230400 (no main board)
+    # test_gaiahand20_double_move_joints_pos_dict(ports_config)
     
-    # 测试 GaiaHand20 双手模式获取位置 - 波特率：230400（不带主控板）
-    # test_gaia20_hand_double_get_joint_positions(ports_config)
+    # Test GaiaHand20 dual-hand get positions — baud 230400 (no main board)
+    # test_gaiahand20_double_get_joint_positions(ports_config)
     
-    # 测试 GaiaHand20 平滑过渡 - 波特率：921600（带主控板）
-    # test_gaia20_hand_smooth_transition(ports_config)
+    # Test GaiaHand20 smooth transition — baud 921600 (with main board)
+    # test_gaiahand20_smooth_transition(ports_config)
     
-    # 测试 GaiaHand20 回零位 - 波特率：921600（带主控板）
-    # test_gaia20_hand_reset_zero(ports_config)
+    # Test GaiaHand20 homing — baud 921600 (with main board)
+    # test_gaiahand20_reset_zero(ports_config)
     
-    # ==================== GaiaHand（15关节）测试 ⚠️ 暂停维护 ====================
+    # ==================== GaiaHand15 (15-joint) tests ⚠️ deprecated ====================
     # print("\n" + "=" * 50)
-    # print("GaiaHand（15关节）测试 ⚠️ 暂停维护，仅用于兼容")
+    # print("GaiaHand15 (15-joint) tests - deprecated, compatibility only")
     # print("=" * 50)
     
-    # 测试回零位 - 波特率：230400（标准配置）
+    # Test homing — baud 230400 (standard configuration)
     # test_reset_pose_zero(ports_config)
     
-    # 测试 GaiaHand 单手模式 - 波特率：921600（示例中，但标准配置应为230400）
-    # test_gaia_hand_move_joints_pos(ports_config)
+    # Test GaiaHand15 single-hand — baud 921600 in example (standard is 230400)
+    # test_gaiahand15_move_joints_pos(ports_config)
     
-    # 测试 GaiaHand 双手模式 - 波特率：230400（标准配置）
-    # test_gaia_hand_double_move_joints_pos(ports_config)
+    # Test GaiaHand15 dual-hand — baud 230400 (standard)
+    # test_gaiahand15_double_move_joints_pos(ports_config)
     
-    # 测试 GaiaHand 平滑过渡 - 波特率：921600（示例中，但标准配置应为230400）
-    # test_gaia_hand_smooth_transition(ports_config)
+    # Test GaiaHand15 smooth transition — baud 921600 in example (standard is 230400)
+    # test_gaiahand15_smooth_transition(ports_config)
     
     # print("\n" + "=" * 50)
-    # print("所有测试完成")
-    # print("⭐ 推荐使用 Gaia20（16关节版本）进行开发")
+    # print("All tests complete")
+    # print("Recommended: use GaiaHand20 (16-joint version) for development")
 
 if __name__ == "__main__":
     main()
