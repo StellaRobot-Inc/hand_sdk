@@ -8,7 +8,7 @@
 
 | 语言 | 安装方式 | 帮助文档 | 例程 |
 |----------|---------|------|---------|
-| Python | `pip install handsdk` | [HandSDK开发指南](https://qcnqdkti44v2.feishu.cn/wiki/FoLuwaO3ziOTSZkzplHcStIxnm7) | [GaiaHand](./example/gaiahand_example.py) [PantheonHand](./example/pantheonhand_example.py) |
+| Python | `pip install handsdk` | [HandSDK快速上手指南（GaiaHand20）](https://qcnqdkti44v2.feishu.cn/docx/JhOBdUFwconvDZxAnobc9Cqan36)<br>[HandSDK开发指南](https://qcnqdkti44v2.feishu.cn/wiki/FoLuwaO3ziOTSZkzplHcStIxnm7) | [GaiaHand20](./example/gaiahand_example.py) <br>[PantheonHand20](./example/pantheonhand_example.py) |
 
 # SDK 架构
 ```
@@ -32,6 +32,8 @@ hand/
 ```
 
 # 帮助文档
+查看[HandSDK快速上手指南（GaiaHand20）](https://qcnqdkti44v2.feishu.cn/docx/JhOBdUFwconvDZxAnobc9Cqan36)以快速开始
+
 更多详细的文档内容，可查看[HandSDK开发指南](https://qcnqdkti44v2.feishu.cn/wiki/FoLuwaO3ziOTSZkzplHcStIxnm7)
 
 # 联系我们
